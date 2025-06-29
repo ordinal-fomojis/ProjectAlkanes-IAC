@@ -23,10 +23,6 @@ env:
   ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
   ENVIRONMENT: ${{ inputs.environment || 'prod' }}
 
-defaults:
-  run:
-    working-directory: terraform
-
 jobs:
   terraform-plan:
     name: 'Terraform Plan'
