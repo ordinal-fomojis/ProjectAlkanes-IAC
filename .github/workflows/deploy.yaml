@@ -48,7 +48,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init -backend-config="key=terraform-${{ env.ENVIRONMENT }}.tfstate"
+        run: terraform init -backend-config="key=alkanes-${{ env.ENVIRONMENT }}.tfstate"
       
       - name: Terraform Format
         run: terraform fmt -check
@@ -126,7 +126,7 @@ jobs:
       uses: hashicorp/setup-terraform@v3
     
     - name: Terraform Init
-      run: terraform init -backend-config="key=terraform-${{ env.ENVIRONMENT }}.tfstate"
+      run: terraform init -backend-config="key=alkanes-${{ env.ENVIRONMENT }}.tfstate"
 
     - name: Download Terraform Plan
       uses: actions/download-artifact@v4
