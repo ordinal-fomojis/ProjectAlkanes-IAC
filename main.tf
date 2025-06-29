@@ -35,7 +35,7 @@ resource "azurerm_service_plan" "servicePlan" {
   name                = "alkanes-serviceplan"
   resource_group_name = azurerm_resource_group.rg.name
   location            = local.location
-  sku_name            = "B1"
+  sku_name            = "FC1"
   os_type             = "Linux"
 }
 
