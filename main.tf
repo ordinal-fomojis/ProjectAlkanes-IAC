@@ -28,13 +28,13 @@ locals {
 
 resource "azurerm_resource_group" "rg" {
   name     = "alkanes-${var.env_name}"
-  location = var.location
+  location = local.location
 }
 
 resource "azurerm_service_plan" "servicePlan" {
   name                   = "alkanes-serviceplan"
   resource_group_name    = azurerm_resource_group.rg.name
-  location               = var.location
+  location               = local.location
   sku_name               = "B1"
   os_type                = "Linux"
   zone_balancing_enabled = false
@@ -43,7 +43,7 @@ resource "azurerm_service_plan" "servicePlan" {
 resource "azurerm_storage_account" "storageAccount" {
   name                            = "alkanesstorage"
   resource_group_name             = azurerm_resource_group.rg.name
-  location                        = var.location
+  location                        = local.location
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   allow_nested_items_to_be_public = false
@@ -58,14 +58,14 @@ resource "azurerm_storage_container" "storageContainer" {
 
 resource "azurerm_log_analytics_workspace" "logAnalyticsWorkspace" {
   name                = "alkanes-loganalytics"
-  location            = var.location
+  location            = local.location
   resource_group_name = azurerm_resource_group.rg.name
   retention_in_days   = 30
 }
 
 resource "azurerm_application_insights" "appInsights" {
   name                = "alkanes-appinsights"
-  location            = var.location
+  location            = local.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "web"
   workspace_id        = azurerm_log_analytics_workspace.logAnalyticsWorkspace.id
@@ -74,7 +74,7 @@ resource "azurerm_application_insights" "appInsights" {
 resource "azurerm_function_app_flex_consumption" "functionApps" {
   name                        = "alkanes-functionapp"
   resource_group_name         = azurerm_resource_group.rg.name
-  location                    = var.location
+  location                    = local.location
   service_plan_id             = azurerm_service_plan.servicePlan.id
   storage_container_type      = "blobContainer"
   storage_container_endpoint  = local.blobStorageAndContainer
