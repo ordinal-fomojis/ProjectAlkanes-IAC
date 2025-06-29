@@ -21,6 +21,8 @@ provider "azurerm" {
   }
 }
 
+data "azurerm_client_config" "current" {}
+
 locals {
   blobStorageAndContainer = "${azurerm_storage_account.storageAccount.primary_blob_endpoint}deploymentpackage"
   location                = "East US 2"
@@ -88,12 +90,31 @@ resource "azurerm_function_app_flex_consumption" "functionApps" {
   app_settings = {
     "AzureWebJobsStorage"              = "" //workaround until https://github.com/hashicorp/terraform-provider-azurerm/pull/29099 gets released
     "AzureWebJobsStorage__accountName" = azurerm_storage_account.storageAccount.name
+    "DOTENV_PRIVATE_KEY_PRODUCTION"    = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.keyVault.name};SecretName=DotenvPrivateKey)"
   }
+}
+
+resource "azurerm_key_vault" "keyVault" {
+  name                        = "alkanes-kv-${var.env_name}"
+  location                    = azurerm_resource_group.rg.location
+  resource_group_name         = azurerm_resource_group.rg.name
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  enabled_for_disk_encryption = true
+  enable_rbac_authorization   = true
+
+  sku_name = "standard"
 }
 
 resource "azurerm_role_assignment" "storage_roleassignment" {
   scope                = azurerm_storage_account.storageAccount.id
   role_definition_name = "Storage Blob Data Owner"
+  principal_id         = azurerm_function_app_flex_consumption.functionApps.identity.0.principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_role_assignment" "keyvault_roleassignment" {
+  scope                = azurerm_key_vault.keyVault.id
+  role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_function_app_flex_consumption.functionApps.identity.0.principal_id
   principal_type       = "ServicePrincipal"
 }
