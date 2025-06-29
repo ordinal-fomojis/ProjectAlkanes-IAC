@@ -32,19 +32,19 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_service_plan" "servicePlan" {
-  name                   = "alkanes-serviceplan"
-  resource_group_name    = azurerm_resource_group.rg.name
-  location               = local.location
-  sku_name               = "B1"
-  os_type                = "Linux"
+  name                = "alkanes-serviceplan"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = local.location
+  sku_name            = "B1"
+  os_type             = "Linux"
 }
 
 resource "azurerm_storage_account" "storageAccount" {
-  name                            = "alkanesstorage"
-  resource_group_name             = azurerm_resource_group.rg.name
-  location                        = local.location
-  account_tier                    = "Standard"
-  account_replication_type        = "LRS"
+  name                     = "alkanesstorage"
+  resource_group_name      = azurerm_resource_group.rg.name
+  location                 = local.location
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
 }
 
 resource "azurerm_storage_container" "storageContainer" {
