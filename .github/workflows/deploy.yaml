@@ -1,0 +1,143 @@
+name: Deploy IaC
+on:
+  pull_request: ~
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'prod'
+        type: choice
+        options:
+          - prod
+          - nonprod
+
+permissions:
+  id-token: write # Required for OIDC authentication with Azure
+  contents: read
+  issues: write
+
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  ENVIRONMENT: ${{ inputs.environment || 'prod' }}
+
+defaults:
+  run:
+    working-directory: terraform
+
+jobs:
+  terraform-plan:
+    name: 'Terraform Plan'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'prod' }}
+    outputs:
+      tfplanExitCode: ${{ steps.tf-plan.outputs.exitcode }}
+      formatted_plan: ${{ steps.publish-terraform-plan.outputs.formatted_plan }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure CLI Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+    
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init -backend-config="key=terraform-${{ env.ENVIRONMENT }}.tfstate"
+      
+      - name: Terraform Format
+        run: terraform fmt -check
+
+      - name: Terraform Plan
+        id: tf-plan
+        run: |
+          export exitcode=0
+          terraform plan -detailed-exitcode -no-color -out tfplan || export exitcode=$?
+  
+          echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+          
+          if [ $exitcode -eq 1 ]; then
+            echo Terraform Plan Failed!
+            exit 1
+          else 
+            exit 0
+          fi
+        env:
+          TF_VAR_env_name: ${{ env.ENVIRONMENT }}
+      
+      - name: Publish Terraform Plan
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan
+          path: terraform/tfplan
+      
+      - name: Publish Terraform Plan to Task Summary
+        id: publish-terraform-plan
+        run: |
+          TERRAFORM_PLAN=$(terraform show -no-color tfplan)
+          
+          FORMATTED_PLAN=$'## Terraform Plan Output\n'
+          FORMATTED_PLAN+=$'<details><summary>Click to expand</summary>\n\n'
+          FORMATTED_PLAN+=$'```terraform\n'
+          FORMATTED_PLAN+=$TERRAFORM_PLAN
+          FORMATTED_PLAN+=$'\n```\n</details>'
+
+          echo "$FORMATTED_PLAN" >> $GITHUB_STEP_SUMMARY
+
+          {
+            echo 'formatted_plan<<EOF'
+            echo "$FORMATTED_PLAN"
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+  terraform-apply:
+    name: 'Terraform Apply'
+    if: needs.terraform-plan.outputs.tfplanExitCode == 2 && (github.ref_name == 'main' || inputs.environment == 'nonprod')
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'prod' }}
+    needs: [terraform-plan]
+    
+    steps:
+    - name: Await Approval
+      if: ${{ env.ENVIRONMENT == 'prod' }}
+      uses: trstringer/manual-approval@v1
+      with:
+        secret: ${{ github.TOKEN }}
+        approvers: Vanniix
+        issue-title: "Approval of Terraform Plan"
+        issue-body: "Do you want to apply this terraform plan?\n${{ needs.terraform-plan.outputs.formatted_plan }}"
+    
+    - name: Checkout
+      uses: actions/checkout@v4
+    
+    - name: Azure CLI Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+    
+    - name: Terraform Init
+      run: terraform init -backend-config="key=terraform-${{ env.ENVIRONMENT }}.tfstate"
+
+    - name: Download Terraform Plan
+      uses: actions/download-artifact@v4
+      with:
+        name: tfplan
+        path: terraform
+
+    - name: Terraform Apply
+      run: terraform apply -auto-approve tfplan
+        
