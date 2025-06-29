@@ -32,7 +32,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_service_plan" "servicePlan" {
-  name                = "alkanes-serviceplan"
+  name                = "alkanes-serviceplan-${var.env_name}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = local.location
   sku_name            = "FC1"
@@ -40,7 +40,7 @@ resource "azurerm_service_plan" "servicePlan" {
 }
 
 resource "azurerm_storage_account" "storageAccount" {
-  name                     = "alkanesstorage"
+  name                     = "alkanesstorage${var.env_name}"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = local.location
   account_tier             = "Standard"
@@ -54,14 +54,14 @@ resource "azurerm_storage_container" "storageContainer" {
 }
 
 resource "azurerm_log_analytics_workspace" "logAnalyticsWorkspace" {
-  name                = "alkanes-loganalytics"
+  name                = "alkanes-loganalytics-${var.env_name}"
   location            = local.location
   resource_group_name = azurerm_resource_group.rg.name
   retention_in_days   = 30
 }
 
 resource "azurerm_application_insights" "appInsights" {
-  name                = "alkanes-appinsights"
+  name                = "alkanes-appinsights-${var.env_name}"
   location            = local.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "web"
@@ -69,7 +69,7 @@ resource "azurerm_application_insights" "appInsights" {
 }
 
 resource "azurerm_function_app_flex_consumption" "functionApps" {
-  name                        = "alkanes-functionapp"
+  name                        = "alkanes-functionapp-${var.env_name}"
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = local.location
   service_plan_id             = azurerm_service_plan.servicePlan.id
