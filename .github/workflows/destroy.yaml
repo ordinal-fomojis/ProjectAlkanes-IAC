@@ -1,4 +1,4 @@
-name: Deploy IaC
+name: Terraform Destroy
 on:
   workflow_dispatch:
     inputs:
