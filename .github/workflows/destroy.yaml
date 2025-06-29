@@ -44,5 +44,5 @@ jobs:
     - name: Terraform Init
       run: terraform init -backend-config="key=alkanes-${{ env.ENVIRONMENT }}.tfstate"
 
-    - name: Terraform Apply
+    - name: Terraform Destroy
       run: terraform destroy -auto-approve
