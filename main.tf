@@ -21,6 +21,8 @@ provider "azurerm" {
   }
 }
 
+data "azurerm_client_config" "current" {}
+
 locals {
   blobStorageAndContainer = "${azurerm_storage_account.storageAccount.primary_blob_endpoint}deploymentpackage"
   location                = "East US 2"
