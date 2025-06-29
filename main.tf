@@ -40,7 +40,7 @@ resource "azurerm_service_plan" "servicePlan" {
 }
 
 resource "azurerm_storage_account" "storageAccount" {
-  name                     = "alkanesstorage-${var.env_name}"
+  name                     = "alkanesstorage${var.env_name}"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = local.location
   account_tier             = "Standard"
