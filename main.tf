@@ -23,7 +23,7 @@ provider "azurerm" {
 
 locals {
   blobStorageAndContainer = "${azurerm_storage_account.storageAccount.primary_blob_endpoint}deploymentpackage"
-  location                = "East US"
+  location                = "East US 2"
 }
 
 resource "azurerm_resource_group" "rg" {
