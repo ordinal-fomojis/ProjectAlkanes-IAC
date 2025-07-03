@@ -110,6 +110,7 @@ resource "azurerm_linux_web_app" "webapp" {
 
   site_config {
     health_check_path = "/health"
+    health_check_eviction_time_in_min = 3
     application_stack {
       node_version = "22-lts"
     }
