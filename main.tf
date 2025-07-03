@@ -132,14 +132,14 @@ resource "azurerm_key_vault" "key_vault" {
 resource "azurerm_role_assignment" "storage_roleassignment" {
   scope                = azurerm_storage_account.storage_account.id
   role_definition_name = "Storage Blob Data Owner"
-  principal_id         = azurerm_function_app_flex_consumption.function_app.identity.0.principal_id
+  principal_id         = azurerm_linux_function_app.function_app.identity.0.principal_id
   principal_type       = "ServicePrincipal"
 }
 
 resource "azurerm_role_assignment" "keyvault_function_roleassignment" {
   scope                = azurerm_key_vault.key_vault.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_function_app_flex_consumption.function_app.identity.0.principal_id
+  principal_id         = azurerm_linux_function_app.function_app.identity.0.principal_id
   principal_type       = "ServicePrincipal"
 }
 
