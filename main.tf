@@ -23,7 +23,7 @@ provider "azurerm" {
 
 data "azurerm_client_config" "current" {}
 
-resource "random_pet" "random_id" {
+resource "random_pet" "random_id.id" {
   separator = ""
 }
 
@@ -33,7 +33,7 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_service_plan" "service_plan" {
-  name                = "alkanes-serviceplan-${random_pet.random_id}-${var.env_name}"
+  name                = "alkanes-serviceplan-${random_pet.random_id.id}-${var.env_name}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   sku_name            = "FC1"
@@ -41,7 +41,7 @@ resource "azurerm_service_plan" "service_plan" {
 }
 
 resource "azurerm_storage_account" "storage_account" {
-  name                     = "alkanesstorage${random_pet.random_id}${var.env_name}"
+  name                     = "alkanesstorage${random_pet.random_id.id}${var.env_name}"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
@@ -55,14 +55,14 @@ resource "azurerm_storage_container" "storage_container" {
 }
 
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
-  name                = "alkanes-loganalytics-${random_pet.random_id}-${var.env_name}"
+  name                = "alkanes-loganalytics-${random_pet.random_id.id}-${var.env_name}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   retention_in_days   = 30
 }
 
 resource "azurerm_application_insights" "app_insights" {
-  name                = "alkanes-appinsights-${random_pet.random_id}-${var.env_name}"
+  name                = "alkanes-appinsights-${random_pet.random_id.id}-${var.env_name}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "web"
@@ -70,7 +70,7 @@ resource "azurerm_application_insights" "app_insights" {
 }
 
 resource "azurerm_function_app_flex_consumption" "function_app" {
-  name                        = "alkanes-functionapp-${random_pet.random_id}-${var.env_name}"
+  name                        = "alkanes-functionapp-${random_pet.random_id.id}-${var.env_name}"
   resource_group_name         = azurerm_resource_group.rg.name
   location                    = azurerm_resource_group.rg.location
   service_plan_id             = azurerm_service_plan.service_plan.id
@@ -94,7 +94,7 @@ resource "azurerm_function_app_flex_consumption" "function_app" {
 }
 
 resource "azurerm_linux_web_app" "webapp" {
-  name                = "alkanes-webapp-${random_pet.random_id}-${var.env_name}"
+  name                = "alkanes-webapp-${random_pet.random_id.id}-${var.env_name}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   service_plan_id     = azurerm_service_plan.service_plan.id
@@ -118,7 +118,7 @@ resource "azurerm_linux_web_app" "webapp" {
 }
 
 resource "azurerm_key_vault" "key_vault" {
-  name                        = "alkanes-kv-${random_pet.random_id}-${var.env_name}"
+  name                        = "alkanes-kv-${random_pet.random_id.id}-${var.env_name}"
   location                    = azurerm_resource_group.rg.location
   resource_group_name         = azurerm_resource_group.rg.name
   tenant_id                   = data.azurerm_client_config.current.tenant_id
