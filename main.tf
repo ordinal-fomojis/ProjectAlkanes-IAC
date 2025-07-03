@@ -23,7 +23,7 @@ provider "azurerm" {
 
 data "azurerm_client_config" "current" {}
 
-resource "random_pet" "random_id.id" {
+resource "random_pet" "random_id" {
   separator = ""
 }
 
