@@ -82,7 +82,7 @@ resource "azurerm_linux_function_app" "function_app" {
   site_config {
     application_insights_connection_string = azurerm_application_insights.app_insights.connection_string
     application_stack {
-      node_version = "22-lts"
+      node_version = "22"
     }
     cors {
       allowed_origins = ["https://portal.azure.com"]
