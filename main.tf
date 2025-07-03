@@ -89,7 +89,7 @@ resource "azurerm_function_app_flex_consumption" "function_app" {
   app_settings = {
     "AzureWebJobsStorage"              = "" //workaround until https://github.com/hashicorp/terraform-provider-azurerm/pull/29099 gets released
     "AzureWebJobsStorage__accountName" = azurerm_storage_account.storage_account.name
-    "DOTENV_PRIVATE_KEY_PRODUCTION"    = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.keyVault.name};SecretName=DotenvPrivateKey)"
+    "DOTENV_PRIVATE_KEY_PRODUCTION"    = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
   }
 }
 
@@ -101,7 +101,11 @@ resource "azurerm_linux_web_app" "webapp" {
   https_only          = true
 
   app_settings = {
-    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.keyVault.name};SecretName=DotenvPrivateKey)"
+    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   site_config {
