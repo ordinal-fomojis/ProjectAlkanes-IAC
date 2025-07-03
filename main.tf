@@ -32,7 +32,7 @@ resource "azurerm_service_plan" "service_plan" {
   name                = "alkanes-serviceplan-${var.env_name}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  sku_name            = "FC1"
+  sku_name            = "B1"
   os_type             = "Linux"
 }
 
@@ -65,27 +65,32 @@ resource "azurerm_application_insights" "app_insights" {
   workspace_id        = azurerm_log_analytics_workspace.log_analytics_workspace.id
 }
 
-resource "azurerm_function_app_flex_consumption" "function_app" {
-  name                        = "alkanes-functionapp-${var.env_name}"
-  resource_group_name         = azurerm_resource_group.rg.name
-  location                    = azurerm_resource_group.rg.location
-  service_plan_id             = azurerm_service_plan.service_plan.id
-  storage_container_type      = "blobContainer"
-  storage_container_endpoint  = "${azurerm_storage_account.storage_account.primary_blob_endpoint}${azurerm_storage_container.storage_container.name}"
-  storage_authentication_type = "SystemAssignedIdentity"
-  runtime_name                = "node"
-  runtime_version             = "22"
+resource "azurerm_linux_function_app" "function_app" {
+  name                = "alkanes-functionapp-${var.env_name}"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+
+  service_plan_id = azurerm_service_plan.service_plan.id
+
+  storage_account_name       = azurerm_storage_account.storage_account.name
+  storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
 
   identity {
     type = "SystemAssigned"
   }
+
   site_config {
     application_insights_connection_string = azurerm_application_insights.app_insights.connection_string
+    application_stack {
+      node_version = "22-lts"
+    }
+    cors {
+      allowed_origins = ["https://portal.azure.com"]
+    }
   }
+
   app_settings = {
-    "AzureWebJobsStorage"              = "" //workaround until https://github.com/hashicorp/terraform-provider-azurerm/pull/29099 gets released
-    "AzureWebJobsStorage__accountName" = azurerm_storage_account.storage_account.name
-    "DOTENV_PRIVATE_KEY_PRODUCTION"    = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
+    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
   }
 }
 
