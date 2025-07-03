@@ -94,17 +94,17 @@ resource "azurerm_function_app_flex_consumption" "function_app" {
 }
 
 resource "azurerm_linux_web_app" "webapp" {
-  name                  = "alkanes-webapp-${random_pet.random_id}-${var.env_name}"
-  location              = azurerm_resource_group.rg.location
-  resource_group_name   = azurerm_resource_group.rg.name
-  service_plan_id       = azurerm_service_plan.service_plan.id
-  https_only            = true
+  name                = "alkanes-webapp-${random_pet.random_id}-${var.env_name}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  service_plan_id     = azurerm_service_plan.service_plan.id
+  https_only          = true
 
   app_settings = {
-    "DOTENV_PRIVATE_KEY_PRODUCTION"    = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.keyVault.name};SecretName=DotenvPrivateKey)"
+    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.keyVault.name};SecretName=DotenvPrivateKey)"
   }
 
-  site_config { 
+  site_config {
     health_check_path = "/health"
     application_stack {
       node_version = "22-lts"
