@@ -23,6 +23,25 @@ provider "azurerm" {
 
 data "azurerm_client_config" "current" {}
 
+locals {
+  environments = {
+    "main" = {
+      name   = "",
+      domain = "api.shovel.space",
+      app_settings = {
+        "MOCK_BTC" = "false"
+      }
+    },
+    "mock" = {
+      name   = "mock",
+      domain = "mock.api.shovel.space",
+      app_settings = {
+        "MOCK_BTC" = "false"
+      }
+    }
+  }
+}
+
 resource "azurerm_resource_group" "rg" {
   name     = "alkanes-${var.env_name}"
   location = "East US 2"
@@ -98,43 +117,17 @@ resource "azurerm_linux_function_app" "function_app" {
 }
 
 resource "azurerm_linux_web_app" "webapp" {
-  name                = "alkanes-webapp-${var.env_name}"
+  for_each            = local.environments
+  name                = "alkanes-webapp${each.value.name == "" ? "" : "-${each.value.name}"}-${var.env_name}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   service_plan_id     = azurerm_service_plan.service_plan.id
   https_only          = true
 
-  app_settings = {
+  app_settings = merge(each.value.app_settings, {
     "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
     "NODE_ENV"                      = "production"
-    "MOCK_BTC"                      = "false"
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  site_config {
-    health_check_path                 = "/health"
-    health_check_eviction_time_in_min = 3
-    application_stack {
-      node_version = "22-lts"
-    }
-  }
-}
-
-resource "azurerm_linux_web_app" "mock_webapp" {
-  name                = "alkanes-mock-webapp-${var.env_name}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.service_plan.id
-  https_only          = true
-
-  app_settings = {
-    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
-    "NODE_ENV"                      = "production"
-    "MOCK_BTC"                      = "true"
-  }
+  })
 
   identity {
     type = "SystemAssigned"
@@ -175,15 +168,28 @@ resource "azurerm_role_assignment" "keyvault_function_roleassignment" {
 }
 
 resource "azurerm_role_assignment" "keyvault_webapp_roleassignment" {
+  for_each             = azurerm_linux_web_app.webapp
   scope                = azurerm_key_vault.key_vault.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_linux_web_app.webapp.identity.0.principal_id
+  principal_id         = each.value.identity.0.principal_id
   principal_type       = "ServicePrincipal"
 }
 
-resource "azurerm_role_assignment" "keyvault_mock_webapp_roleassignment" {
-  scope                = azurerm_key_vault.key_vault.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_linux_web_app.mock_webapp.identity.0.principal_id
-  principal_type       = "ServicePrincipal"
+resource "azurerm_app_service_custom_hostname_binding" "host_binding" {
+  for_each            = azurerm_linux_web_app.webapp
+  hostname            = "mock.api.shovel.space"
+  app_service_name    = each.value.webapp.name
+  resource_group_name = azurerm_resource_group.rg.name
+}
+
+resource "azurerm_app_service_managed_certificate" "managed_certificate" {
+  for_each                   = azurerm_app_service_custom_hostname_binding.host_binding
+  custom_hostname_binding_id = each.value.id
+}
+
+resource "azurerm_app_service_certificate_binding" "certificate_binding" {
+  for_each            = azurerm_linux_web_app.webapp
+  hostname_binding_id = azurerm_app_service_custom_hostname_binding.host_binding[each.key].id // azurerm_app_service_custom_hostname_binding.mock_host_binding.id
+  certificate_id      = azurerm_app_service_managed_certificate.managed_certificate.id
+  ssl_state           = "SniEnabled"
 }
