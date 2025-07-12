@@ -5,3 +5,7 @@ output "function_app_name" {
 output "webapp_name" {
   value = azurerm_linux_web_app.webapp.name
 }
+
+output "mock_webapp_name" {
+  value = azurerm_linux_web_app.mock_webapp.name
+}

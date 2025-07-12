@@ -74,6 +74,7 @@ resource "azurerm_linux_function_app" "function_app" {
 
   storage_account_name       = azurerm_storage_account.storage_account.name
   storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
+  https_only = true
 
   identity {
     type = "SystemAssigned"
@@ -81,6 +82,8 @@ resource "azurerm_linux_function_app" "function_app" {
 
   site_config {
     application_insights_connection_string = azurerm_application_insights.app_insights.connection_string
+    always_on = true
+    
     application_stack {
       node_version = "22"
     }
@@ -103,6 +106,34 @@ resource "azurerm_linux_web_app" "webapp" {
 
   app_settings = {
     "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
+    "NODE_ENV" = "production"
+    "MOCK_BTC" = "false"
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  site_config {
+    health_check_path                 = "/health"
+    health_check_eviction_time_in_min = 3
+    application_stack {
+      node_version = "22-lts"
+    }
+  }
+}
+
+resource "azurerm_linux_web_app" "mock_webapp" {
+  name                = "alkanes-mock-webapp-${var.env_name}"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  service_plan_id     = azurerm_service_plan.service_plan.id
+  https_only          = true
+
+  app_settings = {
+    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
+    "NODE_ENV" = "production"
+    "MOCK_BTC" = "true"
   }
 
   identity {
@@ -147,5 +178,12 @@ resource "azurerm_role_assignment" "keyvault_webapp_roleassignment" {
   scope                = azurerm_key_vault.key_vault.id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = azurerm_linux_web_app.webapp.identity.0.principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_role_assignment" "keyvault_mock_webapp_roleassignment" {
+  scope                = azurerm_key_vault.key_vault.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_linux_web_app.mock_webapp.identity.0.principal_id
   principal_type       = "ServicePrincipal"
 }
