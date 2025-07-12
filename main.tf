@@ -178,7 +178,7 @@ resource "azurerm_role_assignment" "keyvault_webapp_roleassignment" {
 resource "azurerm_app_service_custom_hostname_binding" "host_binding" {
   for_each            = azurerm_linux_web_app.webapp
   hostname            = "mock.api.shovel.space"
-  app_service_name    = each.value.webapp.name
+  app_service_name    = each.value.name
   resource_group_name = azurerm_resource_group.rg.name
 }
 
