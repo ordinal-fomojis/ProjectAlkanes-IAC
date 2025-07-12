@@ -190,6 +190,6 @@ resource "azurerm_app_service_managed_certificate" "managed_certificate" {
 resource "azurerm_app_service_certificate_binding" "certificate_binding" {
   for_each            = azurerm_linux_web_app.webapp
   hostname_binding_id = azurerm_app_service_custom_hostname_binding.host_binding[each.key].id // azurerm_app_service_custom_hostname_binding.mock_host_binding.id
-  certificate_id      = azurerm_app_service_managed_certificate.managed_certificate.id
+  certificate_id      = azurerm_app_service_managed_certificate.managed_certificate[each.key].id
   ssl_state           = "SniEnabled"
 }
