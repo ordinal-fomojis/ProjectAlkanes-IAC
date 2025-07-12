@@ -12,6 +12,7 @@ output "custom_domain_verification_id" {
   value = {
     for key, value in azurerm_linux_web_app.webapp : key => value.custom_domain_verification_id
   }
+  sensitive = true
 }
 
 output "hostname" {
