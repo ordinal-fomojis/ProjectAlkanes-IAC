@@ -3,9 +3,20 @@ output "function_app_name" {
 }
 
 output "webapp_name" {
-  value = azurerm_linux_web_app.webapp.name
+  value = {
+    for key, value in azurerm_linux_web_app.webapp : key => value.name
+  }
 }
 
-output "mock_webapp_name" {
-  value = azurerm_linux_web_app.mock_webapp.name
+output "custom_domain_verification_id" {
+  value = {
+    for key, value in azurerm_linux_web_app.webapp : key => value.custom_domain_verification_id
+  }
+  sensitive = true
+}
+
+output "hostname" {
+  value = {
+    for key, value in azurerm_linux_web_app.webapp : key => value.default_hostname
+  }
 }
