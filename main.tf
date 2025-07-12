@@ -26,13 +26,13 @@ data "azurerm_client_config" "current" {}
 locals {
   environments = {
     "main" = {
-      name   = "",
+      name = "",
       app_settings = {
         "MOCK_BTC" = "false"
       }
     },
     "mock" = {
-      name   = "mock",
+      name = "mock",
       app_settings = {
         "MOCK_BTC" = "true"
       }
