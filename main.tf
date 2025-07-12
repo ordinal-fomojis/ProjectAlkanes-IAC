@@ -36,7 +36,7 @@ locals {
       name   = "mock",
       domain = "mock.api.shovel.space",
       app_settings = {
-        "MOCK_BTC" = "false"
+        "MOCK_BTC" = "true"
       }
     }
   }
