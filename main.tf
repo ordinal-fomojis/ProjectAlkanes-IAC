@@ -74,7 +74,7 @@ resource "azurerm_linux_function_app" "function_app" {
 
   storage_account_name       = azurerm_storage_account.storage_account.name
   storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
-  https_only = true
+  https_only                 = true
 
   identity {
     type = "SystemAssigned"
@@ -82,8 +82,8 @@ resource "azurerm_linux_function_app" "function_app" {
 
   site_config {
     application_insights_connection_string = azurerm_application_insights.app_insights.connection_string
-    always_on = true
-    
+    always_on                              = true
+
     application_stack {
       node_version = "22"
     }
@@ -106,8 +106,8 @@ resource "azurerm_linux_web_app" "webapp" {
 
   app_settings = {
     "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
-    "NODE_ENV" = "production"
-    "MOCK_BTC" = "false"
+    "NODE_ENV"                      = "production"
+    "MOCK_BTC"                      = "false"
   }
 
   identity {
@@ -132,8 +132,8 @@ resource "azurerm_linux_web_app" "mock_webapp" {
 
   app_settings = {
     "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
-    "NODE_ENV" = "production"
-    "MOCK_BTC" = "true"
+    "NODE_ENV"                      = "production"
+    "MOCK_BTC"                      = "true"
   }
 
   identity {
