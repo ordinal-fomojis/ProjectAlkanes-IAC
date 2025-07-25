@@ -44,15 +44,26 @@ resource "azurerm_cdn_frontdoor_origin" "app_service_origin" {
 }
 
 resource "azurerm_cdn_frontdoor_route" "frontdoor_route" {
-  for_each                      = local.environments
-  name                          = "BackendRoute${each.value.name == "" ? "" : "-${each.value.name}"}"
-  cdn_frontdoor_endpoint_id     = azurerm_cdn_frontdoor_endpoint.frontdoor_endpoint.id
-  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.frontdoor_origin_group[each.key].id
-  cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.app_service_origin[each.key].id]
-  cdn_frontdoor_origin_path     = "/"
+  for_each                        = local.environments
+  name                            = "BackendRoute${each.value.name == "" ? "" : "-${each.value.name}"}"
+  cdn_frontdoor_endpoint_id       = azurerm_cdn_frontdoor_endpoint.frontdoor_endpoint.id
+  cdn_frontdoor_origin_group_id   = azurerm_cdn_frontdoor_origin_group.frontdoor_origin_group[each.key].id
+  cdn_frontdoor_origin_ids        = [azurerm_cdn_frontdoor_origin.app_service_origin[each.key].id]
+  cdn_frontdoor_origin_path       = "/"
+  cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.api_custom_domain[each.key].id]
 
   supported_protocols    = ["Http", "Https"]
   patterns_to_match      = [each.value.route]
   forwarding_protocol    = "HttpsOnly"
   https_redirect_enabled = true
+}
+
+resource "azurerm_cdn_frontdoor_custom_domain" "api_custom_domain" {
+  name                     = "ApiDomain${each.value.name == "" ? "" : "-${each.value.name}"}"
+  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor.id
+  host_name                = "api.shovel.space"
+
+  tls {
+    certificate_type = "ManagedCertificate"
+  }
 }
