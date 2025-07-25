@@ -27,14 +27,14 @@ locals {
   environments = {
     "main" = {
       name  = "",
-      route = "/api/*",
+      route = "/*",
       app_settings = {
         "MOCK_BTC" = "false"
       }
     },
     "mock" = {
       name  = "mock",
-      route = "/mock/api/*",
+      route = "/mock/*",
       app_settings = {
         "MOCK_BTC" = "true"
       }
