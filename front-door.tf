@@ -59,6 +59,7 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor_route" {
 }
 
 resource "azurerm_cdn_frontdoor_custom_domain" "api_custom_domain" {
+  for_each                 = local.environments
   name                     = "ApiDomain${each.value.name == "" ? "" : "-${each.value.name}"}"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor.id
   host_name                = "api.shovel.space"
