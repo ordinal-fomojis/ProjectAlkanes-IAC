@@ -51,7 +51,7 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor_route" {
   cdn_frontdoor_origin_ids        = [azurerm_cdn_frontdoor_origin.app_service_origin[each.key].id]
   cdn_frontdoor_origin_path       = "/"
   cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.api_custom_domain.id]
-  
+
   supported_protocols    = ["Http", "Https"]
   patterns_to_match      = [each.value.route]
   forwarding_protocol    = "HttpsOnly"
