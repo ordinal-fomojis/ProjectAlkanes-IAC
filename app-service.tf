@@ -78,6 +78,9 @@ resource "azurerm_linux_web_app" "webapp" {
     application_stack {
       node_version = "22-lts"
     }
+    cors {
+      allowed_origins = ["http://localhost:3000", "https://shovel.space.com", "https://*-shovel-189a0c86.vercel.app"]
+    }
     ip_restriction {
       service_tag               = "AzureFrontDoor.Backend"
       ip_address                = null
