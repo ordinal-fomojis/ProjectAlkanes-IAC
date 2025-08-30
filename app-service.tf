@@ -98,17 +98,16 @@ resource "azurerm_linux_web_app" "webapp" {
 locals {
   environments = {
     "stage" = {
-      key_name = "DotenvPrivateKeyProd"
-      env_file = "env/.env.prod"
+      dotenv = "prod"
     }
     "dev" = {
-      key_name = "DotenvPrivateKeyNonProd"
+      dotenv = "dev"
     }
     "testnet" = {
-      key_name = "DotenvPrivateKeyNonProd"
+      dotenv = "testnet"
     }
     "mock" = {
-      key_name = "DotenvPrivateKeyNonProd"
+      dotenv = "mock"
     }
   }
 }
@@ -119,10 +118,10 @@ resource "azurerm_linux_web_app_slot" "slot" {
   app_service_id = azurerm_linux_web_app.webapp.id
 
   app_settings = {
-    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=${each.value.key_name})"
-    "APP_ENV"                       = each.key
-    "ENV_FILE"                      = lookup(each.value, "env_file", "env/.env.${each.key}")
-    "NODE_ENV"                      = "production"
+    "DOTENV_PRIVATE_KEY_${upper(each.value.dotenv)}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DOTENV_PRIVATE_KEY_${upper(each.value.dotenv)})"
+    "APP_ENV"                                        = each.key
+    "DOTENV_PATH"                                    = "env/.env.${each.value.dotenv}"
+    "NODE_ENV"                                       = "production"
   }
 
   site_config {
