@@ -2,13 +2,10 @@ name: Terraform Destroy
 on:
   workflow_dispatch:
     inputs:
-      environment:
-        description: 'Environment to deploy to'
+      id:
+        description: 'Id of the deployment. Each unique Id creates separate, independent resources in different resource groups. Leave blank for the default prod deployment.'
         required: true
-        default: 'prod'
-        type: choice
-        options:
-          - nonprod
+        type: string
 
 permissions:
   id-token: write # Required for OIDC authentication with Azure
@@ -16,16 +13,18 @@ permissions:
   issues: write
 
 env:
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  ENVIRONMENT: ${{ inputs.environment || 'prod' }}
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ID: ${{ inputs.id || '' }}
+  TFSTATE_FILE: ${{ inputs.id == '' && 'shovel.tfstate' || 'shovel-${{ inputs.id }}.tfstate' }}
 
 jobs:
   terraform-destroy:
     name: 'Terraform Destroy'
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment || 'prod' }}
+    if: inputs.id != ''
+    environment: ${{ inputs.id == '' && 'prod' || 'nonprod' }}
     
     steps:
     - name: Checkout
@@ -34,17 +33,17 @@ jobs:
     - name: Azure CLI Login
       uses: azure/login@v2
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        client-id: ${{ vars.AZURE_CLIENT_ID }}
+        tenant-id: ${{ vars.AZURE_TENANT_ID }}
+        subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
     
     - name: Terraform Init
-      run: terraform init -backend-config="key=alkanes-${{ env.ENVIRONMENT }}.tfstate"
+      run: terraform init -backend-config="key=${{ env.TFSTATE_FILE }}"
 
     - name: Terraform Destroy
       run: terraform destroy -auto-approve
       env:
-        TF_VAR_env_name: ${{ env.ENVIRONMENT }}
+        TF_VAR_id: ${{ env.ID }}

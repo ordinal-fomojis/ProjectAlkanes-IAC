@@ -40,22 +40,23 @@ locals {
       }
     }
   }
+  postfix = var.id == "" ? "" : "-${var.id}"
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "alkanes-${var.env_name}"
+  name     = "shovel${local.postfix}"
   location = "East US 2"
 }
 
 resource "azurerm_log_analytics_workspace" "log_analytics_workspace" {
-  name                = "alkanes-loganalytics-${var.env_name}"
+  name                = "shovel-loganalytics${local.postfix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   retention_in_days   = 30
 }
 
 resource "azurerm_application_insights" "app_insights" {
-  name                = "alkanes-appinsights-${var.env_name}"
+  name                = "shovel-appinsights${local.postfix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   application_type    = "web"
@@ -63,7 +64,7 @@ resource "azurerm_application_insights" "app_insights" {
 }
 
 resource "azurerm_key_vault" "key_vault" {
-  name                        = "alkanes-kv-${var.env_name}"
+  name                        = "shovel-kv${local.postfix}"
   location                    = azurerm_resource_group.rg.location
   resource_group_name         = azurerm_resource_group.rg.name
   tenant_id                   = data.azurerm_client_config.current.tenant_id
