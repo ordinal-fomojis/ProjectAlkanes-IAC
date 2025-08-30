@@ -118,7 +118,7 @@ resource "azurerm_linux_web_app_slot" "slot" {
   app_service_id = azurerm_linux_web_app.webapp.id
 
   app_settings = {
-    "DOTENV_PRIVATE_KEY_${upper(each.value.dotenv)}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DOTENV_PRIVATE_KEY_${upper(each.value.dotenv)})"
+    "DOTENV_PRIVATE_KEY_${upper(each.value.dotenv)}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey${title(each.value.dotenv)})"
     "APP_ENV"                                        = each.key
     "DOTENV_PATH"                                    = "env/.env.${each.value.dotenv}"
     "NODE_ENV"                                       = "production"
