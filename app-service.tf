@@ -53,17 +53,17 @@ resource "azurerm_linux_function_app" "function_app" {
 }
 
 resource "azurerm_linux_web_app" "webapp" {
-  for_each            = local.environments
-  name                = "shovel-webapp${each.value.name == "" ? "" : "-${each.value.name}"}${local.postfix}"
+  name                = "shovel-webapp${local.postfix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   service_plan_id     = azurerm_service_plan.service_plan.id
   https_only          = true
 
-  app_settings = merge(each.value.app_settings, {
-    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey)"
+  app_settings = {
+    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKeyProd)"
+    "ENV_FILE"                      = "env/.env.prod"
     "NODE_ENV"                      = "production"
-  })
+  }
 
   identity {
     type = "SystemAssigned"
@@ -92,4 +92,37 @@ resource "azurerm_linux_web_app" "webapp" {
       name = "Allow traffic from Front Door"
     }
   }
+}
+
+locals {
+  environments = {
+    "stage" = {
+      key_name = "DotenvPrivateKeyProd"
+      env_file = "env/.env.prod"
+    }
+    "dev" = {
+      key_name = "DotenvPrivateKeyNonProd"
+    }
+    "testnet" = {
+      key_name = "DotenvPrivateKeyNonProd"
+    }
+    "mock" = {
+      key_name = "DotenvPrivateKeyNonProd"
+    }
+  }
+}
+
+resource "azurerm_linux_web_app_slot" "slot" {
+  for_each       = local.environments
+  name           = each.key
+  app_service_id = azurerm_linux_web_app.webapp.id
+
+  app_settings = {
+    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=${each.value.key_name})"
+    "APP_ENV"                       = each.key
+    "ENV_FILE"                      = lookup(each.value, "env_file", "env/.env.${each.key}")
+    "NODE_ENV"                      = "production"
+  }
+
+  site_config {}
 }

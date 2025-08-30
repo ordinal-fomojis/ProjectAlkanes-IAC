@@ -10,8 +10,7 @@ resource "azurerm_cdn_frontdoor_endpoint" "frontdoor_endpoint" {
 }
 
 resource "azurerm_cdn_frontdoor_origin_group" "frontdoor_origin_group" {
-  for_each                 = local.environments
-  name                     = "FrontDoorOriginGroup${each.value.name == "" ? "" : "-${each.value.name}"}"
+  name                     = "FrontDoorOriginGroup"
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.frontdoor.id
   session_affinity_enabled = true
 
@@ -29,26 +28,24 @@ resource "azurerm_cdn_frontdoor_origin_group" "frontdoor_origin_group" {
 }
 
 resource "azurerm_cdn_frontdoor_origin" "app_service_origin" {
-  for_each                      = local.environments
-  name                          = "BackendOrigin${each.value.name == "" ? "" : "-${each.value.name}"}"
-  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.frontdoor_origin_group[each.key].id
+  name                          = "BackendOrigin"
+  cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.frontdoor_origin_group.id
 
   enabled                        = true
-  host_name                      = azurerm_linux_web_app.webapp[each.key].default_hostname
+  host_name                      = azurerm_linux_web_app.webapp.default_hostname
   http_port                      = 80
   https_port                     = 443
-  origin_host_header             = azurerm_linux_web_app.webapp[each.key].default_hostname
+  origin_host_header             = azurerm_linux_web_app.webapp.default_hostname
   priority                       = 1
   weight                         = 1000
   certificate_name_check_enabled = true
 }
 
 resource "azurerm_cdn_frontdoor_route" "frontdoor_route" {
-  for_each                        = local.environments
-  name                            = "BackendRoute${each.value.name == "" ? "" : "-${each.value.name}"}"
+  name                            = "BackendRoute"
   cdn_frontdoor_endpoint_id       = azurerm_cdn_frontdoor_endpoint.frontdoor_endpoint.id
-  cdn_frontdoor_origin_group_id   = azurerm_cdn_frontdoor_origin_group.frontdoor_origin_group[each.key].id
-  cdn_frontdoor_origin_ids        = [azurerm_cdn_frontdoor_origin.app_service_origin[each.key].id]
+  cdn_frontdoor_origin_group_id   = azurerm_cdn_frontdoor_origin_group.frontdoor_origin_group.id
+  cdn_frontdoor_origin_ids        = [azurerm_cdn_frontdoor_origin.app_service_origin.id]
   cdn_frontdoor_origin_path       = "/"
   cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.api_custom_domain.id]
 

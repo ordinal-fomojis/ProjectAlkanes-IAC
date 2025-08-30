@@ -24,22 +24,6 @@ provider "azurerm" {
 data "azurerm_client_config" "current" {}
 
 locals {
-  environments = {
-    "main" = {
-      name  = "",
-      route = "/*",
-      app_settings = {
-        "MOCK_BTC" = "false"
-      }
-    },
-    "mock" = {
-      name  = "mock",
-      route = "/mock/*",
-      app_settings = {
-        "MOCK_BTC" = "true"
-      }
-    }
-  }
   postfix = var.id == "" ? "" : "-${var.id}"
 }
 
