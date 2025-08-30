@@ -40,7 +40,7 @@ locals {
       }
     }
   }
-  postfix = "${var.id == "" ? "" : "-${var.id}"}"
+  postfix = var.id == "" ? "" : "-${var.id}"
 }
 
 resource "azurerm_resource_group" "rg" {
