@@ -46,7 +46,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
-        run: terraform init -backend-config="key=${{ env.TFSTATE_FILE }}.tfstate"
+        run: terraform init -backend-config="key=${{ env.TFSTATE_FILE }}"
       
       - name: Terraform Format
         run: terraform fmt -check
