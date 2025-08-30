@@ -1,3 +1,3 @@
-variable "env_name" {
+variable "id" {
   type = string
 }
