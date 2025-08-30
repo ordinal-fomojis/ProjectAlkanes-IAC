@@ -66,6 +66,10 @@ resource "azurerm_linux_web_app" "webapp" {
     "NODE_ENV"                = "production"
   }
 
+  sticky_settings {
+    app_setting_names = concat([for name, env in local.environments : "DOTENV_PRIVATE_KEY_${upper(env.dotenv)}"], ["APP_ENV", "DOTENV_PATH"])
+  }
+
   identity {
     type = "SystemAssigned"
   }
@@ -123,6 +127,10 @@ resource "azurerm_linux_web_app_slot" "slot" {
     "APP_ENV"                                        = each.key
     "DOTENV_PATH"                                    = "env/.env.${each.value.dotenv}"
     "NODE_ENV"                                       = "production"
+  }
+
+  identity {
+    type = "SystemAssigned"
   }
 
   site_config {
