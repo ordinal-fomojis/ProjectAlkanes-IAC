@@ -60,9 +60,10 @@ resource "azurerm_linux_web_app" "webapp" {
   https_only          = true
 
   app_settings = {
-    "DOTENV_PRIVATE_KEY_PRODUCTION" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKeyProd)"
-    "ENV_FILE"                      = "env/.env.prod"
-    "NODE_ENV"                      = "production"
+    "DOTENV_PRIVATE_KEY_PROD" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKeyProd)"
+    "APP_ENV"                 = "prod"
+    "DOTENV_PATH"             = "env/.env.prod"
+    "NODE_ENV"                = "production"
   }
 
   identity {
