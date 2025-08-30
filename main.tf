@@ -73,9 +73,8 @@ resource "azurerm_role_assignment" "keyvault_function_roleassignment" {
 }
 
 resource "azurerm_role_assignment" "keyvault_webapp_roleassignment" {
-  for_each             = azurerm_linux_web_app.webapp
   scope                = azurerm_key_vault.key_vault.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = each.value.identity.0.principal_id
+  principal_id         = azurerm_linux_web_app.webapp.identity.0.principal_id
   principal_type       = "ServicePrincipal"
 }

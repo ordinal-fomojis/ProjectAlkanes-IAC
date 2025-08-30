@@ -74,6 +74,7 @@ resource "azurerm_linux_web_app" "webapp" {
     health_check_eviction_time_in_min = 3
     ftps_state                        = "Disabled"
     minimum_tls_version               = "1.2"
+    ip_restriction_default_action     = "Deny"
     application_stack {
       node_version = "22-lts"
     }
@@ -124,5 +125,13 @@ resource "azurerm_linux_web_app_slot" "slot" {
     "NODE_ENV"                      = "production"
   }
 
-  site_config {}
+  site_config {
+    health_check_path                 = "/api/health"
+    health_check_eviction_time_in_min = 3
+    ftps_state                        = "Disabled"
+    minimum_tls_version               = "1.2"
+    application_stack {
+      node_version = "22-lts"
+    }
+  }
 }

@@ -46,11 +46,10 @@ resource "azurerm_cdn_frontdoor_route" "frontdoor_route" {
   cdn_frontdoor_endpoint_id       = azurerm_cdn_frontdoor_endpoint.frontdoor_endpoint.id
   cdn_frontdoor_origin_group_id   = azurerm_cdn_frontdoor_origin_group.frontdoor_origin_group.id
   cdn_frontdoor_origin_ids        = [azurerm_cdn_frontdoor_origin.app_service_origin.id]
-  cdn_frontdoor_origin_path       = "/"
   cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.api_custom_domain.id]
 
   supported_protocols    = ["Http", "Https"]
-  patterns_to_match      = [each.value.route]
+  patterns_to_match      = ["/*"]
   forwarding_protocol    = "HttpsOnly"
   https_redirect_enabled = true
 }
