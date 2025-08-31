@@ -67,7 +67,7 @@ resource "azurerm_linux_web_app" "webapp" {
   }
 
   sticky_settings {
-    app_setting_names = concat([for name, env in local.environments : "DOTENV_PRIVATE_KEY_${upper(env.dotenv)}"], ["APP_ENV", "DOTENV_PATH"])
+    app_setting_names = ["APP_ENV", "DOTENV_PATH", "DOTENV_PRIVATE_KEY_PROD", "DOTENV_PRIVATE_KEY_NONPROD"]
   }
 
   identity {
@@ -123,10 +123,10 @@ resource "azurerm_linux_web_app_slot" "slot" {
   app_service_id = azurerm_linux_web_app.webapp.id
 
   app_settings = {
-    "DOTENV_PRIVATE_KEY_${upper(each.value.dotenv)}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey${title(each.value.dotenv)})"
-    "APP_ENV"                                        = each.key
-    "DOTENV_PATH"                                    = "env/.env.${each.value.dotenv}"
-    "NODE_ENV"                                       = "production"
+    "DOTENV_PRIVATE_KEY_${each.value.dotenv == "prod" ? "PROD" : "NONPROD"}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey${each.value.dotenv == "prod" ? "Prod" : "NonProd"})"
+    "APP_ENV"                                                                = each.key
+    "DOTENV_PATH"                                                            = "env/.env.${each.value.dotenv}"
+    "NODE_ENV"                                                               = "production"
   }
 
   identity {
