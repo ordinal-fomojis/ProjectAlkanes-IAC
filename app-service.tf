@@ -51,7 +51,7 @@ resource "azurerm_linux_function_app" "function_app" {
     "NODE_ENV"                = "production"
     "APP_ENV"                 = "prod"
     "DOTENV_PRIVATE_KEY_PROD" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKeyProd)"
-    "DOTENV_PATH"             = "env/.env.nonprod"
+    "DOTENV_PATH"             = "env/.env.prod"
   }
 }
 
