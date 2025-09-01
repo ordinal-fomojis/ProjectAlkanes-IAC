@@ -2,7 +2,7 @@ resource "azurerm_service_plan" "function_app_service_plan" {
   name                = "shovel-function-serviceplan${local.postfix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  sku_name            = "FC1"
+  sku_name            = "B1"
   os_type             = "Linux"
 }
 
@@ -55,34 +55,34 @@ resource "azurerm_linux_function_app" "function_app" {
   }
 }
 
-resource "azurerm_linux_function_app_slot" "function_app_nonprod_slot" {
-  name = "nonprod"
+# resource "azurerm_linux_function_app_slot" "function_app_nonprod_slot" {
+#   name = "nonprod"
 
-  function_app_id            = azurerm_linux_function_app.function_app.id
-  storage_account_name       = azurerm_storage_account.storage_account.name
-  storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
-  https_only                 = true
+#   function_app_id            = azurerm_linux_function_app.function_app.id
+#   storage_account_name       = azurerm_storage_account.storage_account.name
+#   storage_account_access_key = azurerm_storage_account.storage_account.primary_access_key
+#   https_only                 = true
 
-  identity {
-    type = "SystemAssigned"
-  }
+#   identity {
+#     type = "SystemAssigned"
+#   }
 
-  site_config {
-    application_insights_connection_string = azurerm_application_insights.app_insights.connection_string
-    always_on                              = false
+#   site_config {
+#     application_insights_connection_string = azurerm_application_insights.app_insights.connection_string
+#     always_on                              = false
 
-    application_stack {
-      node_version = "22"
-    }
-    cors {
-      allowed_origins = ["https://portal.azure.com"]
-    }
-  }
+#     application_stack {
+#       node_version = "22"
+#     }
+#     cors {
+#       allowed_origins = ["https://portal.azure.com"]
+#     }
+#   }
 
-  app_settings = {
-    "NODE_ENV"                   = "production"
-    "APP_ENV"                    = "nonprod"
-    "DOTENV_PRIVATE_KEY_NONPROD" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKeyNonProd)"
-    "DOTENV_PATH"                = "env/.env.nonprod"
-  }
-}
+#   app_settings = {
+#     "NODE_ENV"                   = "production"
+#     "APP_ENV"                    = "nonprod"
+#     "DOTENV_PRIVATE_KEY_NONPROD" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKeyNonProd)"
+#     "DOTENV_PATH"                = "env/.env.nonprod"
+#   }
+# }

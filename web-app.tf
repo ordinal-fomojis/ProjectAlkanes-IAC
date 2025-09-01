@@ -104,7 +104,7 @@ resource "azurerm_service_plan" "service_plan_nonprod" {
   name                = "shovel-serviceplan-nonprod${local.postfix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  sku_name            = "SHARED"
+  sku_name            = "B1"
   os_type             = "Linux"
 }
 
@@ -132,27 +132,27 @@ resource "azurerm_linux_web_app" "webapp_nonprod" {
   }
 }
 
-resource "azurerm_linux_web_app_slot" "nonprod_slot" {
-  for_each       = toset(["testnet", "mock"])
-  name           = each.key
-  app_service_id = azurerm_linux_web_app.webapp_nonprod.id
+# resource "azurerm_linux_web_app_slot" "nonprod_slot" {
+#   for_each       = toset(["testnet", "mock"])
+#   name           = each.key
+#   app_service_id = azurerm_linux_web_app.webapp_nonprod.id
 
-  app_settings = local.app_settings[each.key]
+#   app_settings = local.app_settings[each.key]
 
-  identity {
-    type = "SystemAssigned"
-  }
+#   identity {
+#     type = "SystemAssigned"
+#   }
 
-  site_config {
-    health_check_path                 = "/api/health"
-    health_check_eviction_time_in_min = 3
-    ftps_state                        = "Disabled"
-    minimum_tls_version               = "1.2"
-    application_stack {
-      node_version = "22-lts"
-    }
-  }
-}
+#   site_config {
+#     health_check_path                 = "/api/health"
+#     health_check_eviction_time_in_min = 3
+#     ftps_state                        = "Disabled"
+#     minimum_tls_version               = "1.2"
+#     application_stack {
+#       node_version = "22-lts"
+#     }
+#   }
+# }
 
 
 resource "azurerm_load_test" "load_test" {
