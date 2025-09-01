@@ -1,8 +1,8 @@
 resource "azurerm_service_plan" "function_app_service_plan" {
-  name                = "shovel-serviceplan${local.postfix}"
+  name                = "shovel-function-serviceplan${local.postfix}"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
-  sku_name            = "B1"
+  sku_name            = "FC1"
   os_type             = "Linux"
 }
 
