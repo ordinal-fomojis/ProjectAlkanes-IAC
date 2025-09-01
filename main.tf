@@ -86,8 +86,22 @@ resource "azurerm_role_assignment" "keyvault_webapp_roleassignment" {
   principal_type       = "ServicePrincipal"
 }
 
-resource "azurerm_role_assignment" "keyvault_webapp_slot_roleassignment" {
-  for_each             = azurerm_linux_web_app_slot.slot
+resource "azurerm_role_assignment" "keyvault_webapp_stage_slot_roleassignment" {
+  scope                = azurerm_key_vault.key_vault.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_linux_web_app_slot.stage_slot.identity.0.principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_role_assignment" "keyvault_webapp_nonprod_roleassignment" {
+  scope                = azurerm_key_vault.key_vault.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_linux_web_app.webapp_nonprod.identity.0.principal_id
+  principal_type       = "ServicePrincipal"
+}
+
+resource "azurerm_role_assignment" "keyvault_webapp_nonprod_slot_roleassignment" {
+  for_each             = azurerm_linux_web_app_slot.nonprod_slot
   scope                = azurerm_key_vault.key_vault.id
   role_definition_name = "Key Vault Secrets User"
   principal_id         = each.value.identity.0.principal_id
