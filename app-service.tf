@@ -178,3 +178,9 @@ resource "azurerm_linux_web_app_slot" "slot" {
     }
   }
 }
+
+resource "azurerm_load_test" "load_test" {
+  location            = azurerm_resource_group.rg.location
+  name                = "shovel-loadtest${local.postfix}"
+  resource_group_name = azurerm_resource_group.rg.name
+}

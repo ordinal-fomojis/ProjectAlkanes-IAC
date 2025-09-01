@@ -100,15 +100,6 @@ jobs:
     needs: [terraform-plan]
     
     steps:
-    - name: Await Approval
-      if: ${{ env.ID == '' }}
-      uses: trstringer/manual-approval@v1
-      with:
-        secret: ${{ github.TOKEN }}
-        approvers: Vanniix
-        issue-title: "Approval of Terraform Plan"
-        issue-body: "Do you want to apply this terraform plan?\n${{ needs.terraform-plan.outputs.formatted_plan }}"
-    
     - name: Checkout
       uses: actions/checkout@v4
     
