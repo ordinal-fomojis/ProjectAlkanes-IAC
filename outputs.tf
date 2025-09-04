@@ -1,5 +1,9 @@
-output "function_app_name" {
-  value = azurerm_linux_function_app.function_app.name
+output "function_app_name_prod" {
+  value = azurerm_function_app_flex_consumption.function_app_prod.name
+}
+
+output "function_app_name_nonprod" {
+  value = azurerm_function_app_flex_consumption.function_app_nonprod.name
 }
 
 output "webapp_prod_name" {
