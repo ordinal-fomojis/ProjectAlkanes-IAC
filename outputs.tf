@@ -1,9 +1,7 @@
-output "function_app_name_prod" {
-  value = azurerm_function_app_flex_consumption.function_app_prod.name
-}
-
-output "function_app_name_nonprod" {
-  value = azurerm_function_app_flex_consumption.function_app_nonprod.name
+output "function_app_name" {
+  value = {
+    for key, value in azurerm_function_app_flex_consumption.function_app : key => value.name
+  }
 }
 
 output "webapp_prod_name" {
