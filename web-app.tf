@@ -55,9 +55,7 @@ locals {
   }
 }
 
-################################
-
-resource "azurerm_service_plan" "service_plan__new" {
+resource "azurerm_service_plan" "service_plan" {
   for_each                        = local.service_plans
   name                            = "shovel-serviceplan-${each.key}${local.postfix}"
   resource_group_name             = azurerm_resource_group.rg.name
@@ -67,12 +65,12 @@ resource "azurerm_service_plan" "service_plan__new" {
   premium_plan_auto_scale_enabled = each.key == "prod"
 }
 
-resource "azurerm_linux_web_app" "webapp__new" {
+resource "azurerm_linux_web_app" "webapp" {
   for_each            = local.apps
   name                = "shovel-webapp-${each.key}${local.postfix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.service_plan__new[each.value.service_name].id
+  service_plan_id     = azurerm_service_plan.service_plan[each.value.service_name].id
   https_only          = true
 
   app_settings = local.app_settings[each.key]
@@ -117,7 +115,7 @@ resource "azurerm_linux_web_app" "webapp__new" {
 resource "azurerm_linux_web_app_slot" "webapp_slot" {
   for_each       = local.slots
   name           = each.key
-  app_service_id = azurerm_linux_web_app.webapp__new[each.value.app_name].id
+  app_service_id = azurerm_linux_web_app.webapp[each.value.app_name].id
 
   app_settings = local.app_settings[each.key]
 
@@ -136,11 +134,11 @@ resource "azurerm_linux_web_app_slot" "webapp_slot" {
   }
 }
 
-resource "azurerm_role_assignment" "keyvault_webapp_roleassignment__new" {
+resource "azurerm_role_assignment" "keyvault_webapp_roleassignment" {
   for_each             = local.all_apps
   scope                = azurerm_key_vault.key_vault.id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = each.value.type == "app" ? azurerm_linux_web_app.webapp__new[each.key].identity.0.principal_id : azurerm_linux_web_app_slot.webapp_slot[each.key].identity.0.principal_id
+  principal_id         = each.value.type == "app" ? azurerm_linux_web_app.webapp[each.key].identity.0.principal_id : azurerm_linux_web_app_slot.webapp_slot[each.key].identity.0.principal_id
   principal_type       = "ServicePrincipal"
 }
 
