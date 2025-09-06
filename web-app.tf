@@ -1,50 +1,81 @@
 locals {
-  environments = {
-    "prod" = {
-      dotenv = "prod"
+  service_plans = {
+    prod = {
+      sku_name = "P0v3"
+      apps = {
+        prod = {
+          dotenv = "prod"
+          slots = {
+            stage = {
+              dotenv = "prod"
+            }
+          }
+        }
+      }
     }
-    "stage" = {
-      dotenv = "prod"
-    }
-    "dev" = {
-      dotenv = "dev"
-    }
-    "testnet" = {
-      dotenv = "testnet"
-    }
-    "mock" = {
-      dotenv = "mock"
+    nonprod = {
+      sku_name = "B1"
+      apps = {
+        dev = {
+          dotenv = "dev"
+        }
+        mock = {
+          dotenv = "mock"
+        }
+        # testnet = {
+        #   dotenv = "nonprod"
+        # }
+      }
     }
   }
+  apps = merge([for service_name, service in local.service_plans : {
+    for app_name, app in service.apps : app_name => {
+      service_name = service_name
+      dotenv       = app.dotenv
+      slots        = lookup(app, "slots", {})
+      type         = "app"
+    }
+  }]...)
+  slots = merge([for app_name, app in local.apps : {
+    for slot_name, slot in app.slots : slot_name => {
+      app_name = app_name
+      dotenv   = slot.dotenv
+      type     = "slot"
+    }
+  }]...)
+  all_apps = merge(local.apps, local.slots)
   app_settings = {
-    for env, config in local.environments : env => {
+    for env, config in local.all_apps : env => {
       "DOTENV_PRIVATE_KEY_${config.dotenv == "prod" ? "PROD" : "NONPROD"}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey${config.dotenv == "prod" ? "Prod" : "NonProd"})"
       "APP_ENV"                                                            = env
       "DOTENV_PATH"                                                        = "env/.env.${config.dotenv}"
       "NODE_ENV"                                                           = "production"
+      "RATE_LIMIT_ENABLED"                                                 = "false"
     }
   }
 }
 
-resource "azurerm_service_plan" "service_plan" {
-  name                            = "shovel-serviceplan${local.postfix}"
+################################
+
+resource "azurerm_service_plan" "service_plan__new" {
+  for_each                        = local.service_plans
+  name                            = "shovel-serviceplan-${each.key}${local.postfix}"
   resource_group_name             = azurerm_resource_group.rg.name
   location                        = azurerm_resource_group.rg.location
-  sku_name                        = "P0v3"
+  sku_name                        = each.value.sku_name
   os_type                         = "Linux"
-  premium_plan_auto_scale_enabled = true
+  premium_plan_auto_scale_enabled = each.key == "prod"
 }
 
-resource "azurerm_linux_web_app" "webapp" {
-  name                = "shovel-webapp${local.postfix}"
+resource "azurerm_linux_web_app" "webapp__new" {
+  for_each            = local.apps
+  name                = "shovel-webapp-${each.key}${local.postfix}"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.service_plan.id
+  service_plan_id     = azurerm_service_plan.service_plan__new[each.value.service_name].id
   https_only          = true
 
-  app_settings = merge(local.app_settings["prod"], {
-    "RATE_LIMIT_ENABLED" = "false"
-  })
+  app_settings = local.app_settings[each.key]
 
   sticky_settings {
     app_setting_names = ["APP_ENV", "DOTENV_PATH", "DOTENV_PRIVATE_KEY_PROD", "DOTENV_PRIVATE_KEY_NONPROD", "RATE_LIMIT_ENABLED"]
@@ -59,32 +90,36 @@ resource "azurerm_linux_web_app" "webapp" {
     health_check_eviction_time_in_min = 3
     ftps_state                        = "Disabled"
     minimum_tls_version               = "1.2"
-    ip_restriction_default_action     = "Deny"
+    ip_restriction_default_action     = each.key == "prod" ? "Deny" : "Allow"
     application_stack {
       node_version = "22-lts"
     }
-    ip_restriction {
-      service_tag               = "AzureFrontDoor.Backend"
-      ip_address                = null
-      virtual_network_subnet_id = null
-      action                    = "Allow"
-      priority                  = 100
-      headers {
-        x_azure_fdid      = [azurerm_cdn_frontdoor_profile.frontdoor.resource_guid]
-        x_fd_health_probe = []
-        x_forwarded_for   = []
-        x_forwarded_host  = []
+    dynamic "ip_restriction" {
+      for_each = each.key == "prod" ? [0] : []
+      content {
+        service_tag               = "AzureFrontDoor.Backend"
+        ip_address                = null
+        virtual_network_subnet_id = null
+        action                    = "Allow"
+        priority                  = 100
+        headers {
+          x_azure_fdid      = [azurerm_cdn_frontdoor_profile.frontdoor.resource_guid]
+          x_fd_health_probe = []
+          x_forwarded_for   = []
+          x_forwarded_host  = []
+        }
+        name = "Allow traffic from Front Door"
       }
-      name = "Allow traffic from Front Door"
     }
   }
 }
 
-resource "azurerm_linux_web_app_slot" "stage_slot" {
-  name           = "stage"
-  app_service_id = azurerm_linux_web_app.webapp.id
+resource "azurerm_linux_web_app_slot" "webapp_slot" {
+  for_each       = local.slots
+  name           = each.key
+  app_service_id = azurerm_linux_web_app.webapp__new[each.value.app_name].id
 
-  app_settings = local.app_settings.stage
+  app_settings = local.app_settings[each.key]
 
   identity {
     type = "SystemAssigned"
@@ -101,60 +136,13 @@ resource "azurerm_linux_web_app_slot" "stage_slot" {
   }
 }
 
-resource "azurerm_service_plan" "service_plan_nonprod" {
-  name                = "shovel-serviceplan-nonprod${local.postfix}"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
-  sku_name            = "B1"
-  os_type             = "Linux"
+resource "azurerm_role_assignment" "keyvault_webapp_roleassignment__new" {
+  for_each             = local.all_apps
+  scope                = azurerm_key_vault.key_vault.id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = each.value.type == "app" ? azurerm_linux_web_app.webapp__new[each.key].identity.0.principal_id : azurerm_linux_web_app_slot.webapp_slot[each.key].identity.0.principal_id
+  principal_type       = "ServicePrincipal"
 }
-
-resource "azurerm_linux_web_app" "webapp_nonprod" {
-  name                = "shovel-webapp-nonprod${local.postfix}"
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  service_plan_id     = azurerm_service_plan.service_plan_nonprod.id
-  https_only          = true
-
-  app_settings = local.app_settings.dev
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  site_config {
-    health_check_path                 = "/api/health"
-    health_check_eviction_time_in_min = 3
-    ftps_state                        = "Disabled"
-    minimum_tls_version               = "1.2"
-    application_stack {
-      node_version = "22-lts"
-    }
-  }
-}
-
-# resource "azurerm_linux_web_app_slot" "nonprod_slot" {
-#   for_each       = toset(["testnet", "mock"])
-#   name           = each.key
-#   app_service_id = azurerm_linux_web_app.webapp_nonprod.id
-
-#   app_settings = local.app_settings[each.key]
-
-#   identity {
-#     type = "SystemAssigned"
-#   }
-
-#   site_config {
-#     health_check_path                 = "/api/health"
-#     health_check_eviction_time_in_min = 3
-#     ftps_state                        = "Disabled"
-#     minimum_tls_version               = "1.2"
-#     application_stack {
-#       node_version = "22-lts"
-#     }
-#   }
-# }
-
 
 resource "azurerm_load_test" "load_test" {
   location            = azurerm_resource_group.rg.location

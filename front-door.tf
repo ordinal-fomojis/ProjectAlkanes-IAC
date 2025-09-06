@@ -32,10 +32,10 @@ resource "azurerm_cdn_frontdoor_origin" "app_service_origin" {
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.frontdoor_origin_group.id
 
   enabled                        = true
-  host_name                      = azurerm_linux_web_app.webapp.default_hostname
+  host_name                      = azurerm_linux_web_app.webapp__new["prod"].default_hostname
   http_port                      = 80
   https_port                     = 443
-  origin_host_header             = azurerm_linux_web_app.webapp.default_hostname
+  origin_host_header             = azurerm_linux_web_app.webapp__new["prod"].default_hostname
   priority                       = 1
   weight                         = 1000
   certificate_name_check_enabled = true
