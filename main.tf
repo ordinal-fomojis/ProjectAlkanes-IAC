@@ -57,39 +57,3 @@ resource "azurerm_key_vault" "key_vault" {
 
   sku_name = "standard"
 }
-
-# resource "azurerm_role_assignment" "keyvault_function_nonprod_roleassignment" {
-#   scope                = azurerm_key_vault.key_vault.id
-#   role_definition_name = "Key Vault Secrets User"
-#   principal_id         = azurerm_linux_function_app_slot.function_app_nonprod_slot.identity.0.principal_id
-#   principal_type       = "ServicePrincipal"
-# }
-
-resource "azurerm_role_assignment" "keyvault_webapp_roleassignment" {
-  scope                = azurerm_key_vault.key_vault.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_linux_web_app.webapp.identity.0.principal_id
-  principal_type       = "ServicePrincipal"
-}
-
-resource "azurerm_role_assignment" "keyvault_webapp_stage_slot_roleassignment" {
-  scope                = azurerm_key_vault.key_vault.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_linux_web_app_slot.stage_slot.identity.0.principal_id
-  principal_type       = "ServicePrincipal"
-}
-
-resource "azurerm_role_assignment" "keyvault_webapp_nonprod_roleassignment" {
-  scope                = azurerm_key_vault.key_vault.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_linux_web_app.webapp_nonprod.identity.0.principal_id
-  principal_type       = "ServicePrincipal"
-}
-
-# resource "azurerm_role_assignment" "keyvault_webapp_nonprod_slot_roleassignment" {
-#   for_each             = azurerm_linux_web_app_slot.nonprod_slot
-#   scope                = azurerm_key_vault.key_vault.id
-#   role_definition_name = "Key Vault Secrets User"
-#   principal_id         = each.value.identity.0.principal_id
-#   principal_type       = "ServicePrincipal"
-# }

@@ -7,14 +7,6 @@ locals {
       dotenv = "nonprod"
     }
   }
-  fa_app_settings = {
-    for env, config in local.fa_environments : env => {
-      "DOTENV_PRIVATE_KEY_${config.dotenv == "prod" ? "PROD" : "NONPROD"}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey${config.dotenv == "prod" ? "Prod" : "NonProd"})"
-      "APP_ENV"                                                            = env
-      "DOTENV_PATH"                                                        = "env/.env.${config.dotenv}"
-      "NODE_ENV"                                                           = "production"
-    }
-  }
 }
 
 resource "azurerm_storage_account" "storage_account" {
@@ -70,7 +62,12 @@ resource "azurerm_function_app_flex_consumption" "function_app" {
     }
   }
 
-  app_settings = local.fa_app_settings[each.key]
+  app_settings = {
+    "DOTENV_PRIVATE_KEY_${each.value.dotenv == "prod" ? "PROD" : "NONPROD"}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey${each.value.dotenv == "prod" ? "Prod" : "NonProd"})"
+    "APP_ENV"                                                                = each.key
+    "DOTENV_PATH"                                                            = "env/.env.${each.value.dotenv}"
+    "NODE_ENV"                                                               = "production"
+  }
 }
 
 resource "azurerm_role_assignment" "keyvault_function_roleassignment" {
