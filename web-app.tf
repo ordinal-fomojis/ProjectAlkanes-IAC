@@ -46,7 +46,7 @@ locals {
   all_apps = merge(local.apps, local.slots)
   app_settings = {
     for env, config in local.all_apps : env => {
-      "DOTENV_PRIVATE_KEY_${config.dotenv == "prod" ? "PROD" : "NONPROD"}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey${config.dotenv == "prod" ? "Prod" : "NonProd"})"
+      "DOTENV_PRIVATE_KEY_${upper(config.dotenv)}" = "@Microsoft.KeyVault(VaultName=${azurerm_key_vault.key_vault.name};SecretName=DotenvPrivateKey${config.dotenv == "prod" ? "Prod" : "NonProd"})"
       "APP_ENV"                                                            = env
       "DOTENV_PATH"                                                        = "env/.env.${config.dotenv}"
       "NODE_ENV"                                                           = "production"
