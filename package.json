@@ -1,0 +1,10 @@
+{
+  "name": "shovel-iac",
+  "version": "1.0.0",
+  "description": "Infrastructure and k8s config for Shovel Backend services and Jobs",
+  "scripts": {
+    "tf-plan": "./scripts/tf-plan.sh",
+    "tf-apply": "./scripts/tf-apply.sh",
+    "kubectl-init": "./scripts/kubectl-init.sh"
+  }
+}
