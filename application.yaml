@@ -6,12 +6,11 @@ metadata:
 spec:
   project: default
   source:
-    chart: shovel
-    repoURL: https://github.com/ordinal-fomojis/ProjectAlkanes-IAC.git
+    repoURL: https://github.com/ordinal-fomojis/ProjectAlkanes-IAC
     targetRevision: HEAD
     path: helm
   destination:
-    server: "https://kubernetes.default.svc"
+    server: https://kubernetes.default.svc
     namespace: shovel
 
   syncPolicy:
