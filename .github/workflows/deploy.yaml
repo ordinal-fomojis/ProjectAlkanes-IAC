@@ -1,6 +1,11 @@
 name: Deploy IaC
 on:
-  pull_request: ~
+  pull_request:
+    branches:
+      - main
+    paths: 
+      - 'terraform/**'
+      - '.github/workflows/deploy.yaml'
   workflow_dispatch:
     inputs:
       id:
