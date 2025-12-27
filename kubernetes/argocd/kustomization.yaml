@@ -9,3 +9,11 @@ resources:
 
 patches:
 - path: patches/argocd-cmd-params-cm.yaml
+
+secretGenerator:
+- name: github-repo-credential
+  options:
+    disableNameSuffixHash: true
+    labels:
+      argocd.argoproj.io/secret-type: repository
+  env: .env

@@ -62,3 +62,4 @@ jobs:
       - name: Install Argo CD into aks
         run: |
           kubectl apply -k ./kubernetes/argocd
+          kubectl apply -f ./kubernetes/root-application.yaml
