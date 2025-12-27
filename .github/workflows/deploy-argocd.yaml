@@ -61,5 +61,6 @@ jobs:
       
       - name: Install Argo CD into aks
         run: |
+          echo "password=${{ secrets.ALKANES_IAC_PAT }}" > ./kubernetes/argocd/.env
           kubectl apply -k ./kubernetes/argocd
           kubectl apply -f ./kubernetes/root-application.yaml
