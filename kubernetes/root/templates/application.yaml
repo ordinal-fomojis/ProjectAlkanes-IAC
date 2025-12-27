@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: {{ $config.repo-url | default "https://github.com/ordinal-fomojis/ProjectAlkanes-IAC" }}
+    repoURL: {{ $config.repoUrl | default "https://github.com/ordinal-fomojis/ProjectAlkanes-IAC" }}
     targetRevision: HEAD
     path: kubernetes/{{ $config.name }}
   destination:
