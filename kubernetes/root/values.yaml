@@ -1,5 +1,3 @@
 apps:
   - name: argocd
-  - name: nginx-fabric
-    repoUrl: https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.3.0
-    enabled: false
+  - name: gateway
