@@ -1,4 +1,4 @@
-name: Terraform Destroy
+name: Destroy Terraform
 on:
   workflow_dispatch:
     inputs:
@@ -10,7 +10,6 @@ on:
 permissions:
   id-token: write # Required for OIDC authentication with Azure
   contents: read
-  issues: write
 
 env:
   ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}

@@ -1,0 +1,64 @@
+name: Deploy Argo CD
+on:
+  workflow_dispatch:
+    inputs:
+      id:
+        description: 'Id of the IaC deployment. Leave blank for the default prod deployment.'
+        default: ''
+        type: string
+
+permissions:
+  id-token: write # Required for OIDC authentication with Azure
+  contents: read
+
+env:
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ID: ${{ inputs.id || '' }}
+  TFSTATE_FILE: ${{ inputs.id == '' && 'shovel.tfstate' || format('shovel-{0}.tfstate', inputs.id) }}
+
+jobs:
+  argocd-deploy:
+    name: 'Deploy Argo CD'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.id == '' && 'prod' || 'nonprod' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure CLI Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: |
+          terraform init -backend-config="key=${{ env.TFSTATE_FILE }}"
+          echo "rg_name=$(terraform output -raw rg_name)" >> $GITHUB_OUTPUT
+          echo "aks_cluster_name=$(terraform output -raw aks_cluster_name)" >> $GITHUB_OUTPUT
+        working-directory: terraform
+
+      - name: Set up kubelogin for non-interactive login
+        uses: azure/use-kubelogin@v1
+        with:
+          kubelogin-version: 'v0.0.25'
+          
+      - name: Get Kube Context
+        uses: azure/aks-set-context@v3
+        with:
+          resource-group: ${{ steps.tf-outputs.outputs.rg_name }}
+          cluster-name: ${{ steps.tf-outputs.outputs.aks_cluster_name }}
+          admin: 'true'
+          use-kubelogin: 'true'
+      
+      - name: Install Argo CD into aks
+        run: |
+          kubectl apply -k ./kubernetes/argocd

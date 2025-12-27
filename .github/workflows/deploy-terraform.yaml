@@ -1,4 +1,4 @@
-name: Deploy IaC
+name: Deploy Terraform
 on:
   pull_request:
     branches:
@@ -16,7 +16,6 @@ on:
 permissions:
   id-token: write # Required for OIDC authentication with Azure
   contents: read
-  issues: write
 
 defaults:
   run:
