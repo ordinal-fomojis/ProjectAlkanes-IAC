@@ -1,3 +1,5 @@
 apps:
   - name: argocd
-  - name: cert-manager
+  - name: nginx-fabric
+    repo-url: https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.3.0
+    enabled: false
