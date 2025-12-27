@@ -64,3 +64,4 @@ jobs:
           echo "password=${{ secrets.ALKANES_IAC_PAT }}" > ./kubernetes/argocd/.env
           kubectl apply -k ./kubernetes/argocd
           kubectl apply -f ./kubernetes/root-application.yaml
+          rm -f ./kubernetes/argocd/.env
