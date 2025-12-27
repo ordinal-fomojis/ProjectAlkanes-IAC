@@ -5,7 +5,7 @@ on:
       - main
     paths: 
       - 'terraform/**'
-      - '.github/workflows/deploy.yaml'
+      - '.github/workflows/deploy-terraform.yaml'
   workflow_dispatch:
     inputs:
       id:
