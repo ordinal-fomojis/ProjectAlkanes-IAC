@@ -40,6 +40,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Terraform Init
+        id: tf-outputs
         run: |
           terraform init -backend-config="key=${{ env.TFSTATE_FILE }}"
           echo "rg_name=$(terraform output -raw rg_name)" >> $GITHUB_OUTPUT
