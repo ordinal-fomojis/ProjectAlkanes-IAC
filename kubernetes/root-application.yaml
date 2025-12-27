@@ -11,7 +11,7 @@ spec:
     path: kubernetes/root
   destination:
     server: https://kubernetes.default.svc
-    namespace: root-application
+    namespace: root
 
   syncPolicy:
     automated:
