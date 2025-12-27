@@ -17,6 +17,18 @@ spec:
           apiVersion: controller.config.cert-manager.io/v1alpha1
           kind: ControllerConfiguration
           enableGatewayAPI: true
+        webhook:
+          validatingWebhookConfiguration:
+            namespaceSelector:
+              matchExpressions:
+                - key: control-plane
+                  operator: NotIn
+                  values:
+                    - 'true'
+                - key: kubernetes.azure.com/managedby
+                  operator: NotIn
+                  values:
+                    - aks
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
