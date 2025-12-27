@@ -3,9 +3,6 @@ on:
   pull_request:
     branches:
       - main
-    paths: 
-      - 'terraform/**'
-      - '.github/workflows/deploy-terraform.yaml'
   workflow_dispatch:
     inputs:
       id:
