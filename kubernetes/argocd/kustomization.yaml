@@ -9,3 +9,15 @@ resources:
 
 patches:
 - path: patches/argocd-cmd-params-cm.yaml
+
+secretGenerator:
+- name: github-repo-credential
+  options:
+    disableNameSuffixHash: true
+    labels:
+      argocd.argoproj.io/secret-type: repository
+  literals:
+  - type=git
+  - url=https://github.com/ordinal-fomojis/ProjectAlkanes-IAC
+  - username=admin
+  env: .env
