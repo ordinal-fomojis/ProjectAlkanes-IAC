@@ -59,6 +59,10 @@ jobs:
           cluster-name: ${{ steps.tf-outputs.outputs.aks_cluster_name }}
           admin: 'true'
           use-kubelogin: 'true'
+
+      - name: Install Gateway API CRDs
+        run: |
+          kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
       
       - name: Install Argo CD into aks
         run: |
