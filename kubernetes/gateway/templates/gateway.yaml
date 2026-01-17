@@ -10,12 +10,14 @@ spec:
   - name: http
     port: 80
     protocol: HTTP
-  - name: https
-    hostname: "*.shovel.space"
+{{- range $config := .Values.routes }}
+  - name: {{ $config.subdomain }}-https
+    hostname: "{{ $config.subdomain }}.shovel.space"
     port: 443
     protocol: HTTPS
     tls:
       mode: Terminate
       certificateRefs:
       - kind: Secret
-        name: tls-certificate
+        name: {{ $config.subdomain }}-tls-certificate
+{{- end -}}

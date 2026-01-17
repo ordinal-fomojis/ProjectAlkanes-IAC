@@ -1,0 +1,5 @@
+routes:
+  - subdomain: argocd
+    service: argocd-server
+  - subdomain: api
+    service: api-service
