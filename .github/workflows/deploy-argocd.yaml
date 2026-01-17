@@ -83,11 +83,10 @@ jobs:
         with:
           node-version: 24
 
-      - name: Install dependencies
+      - name: Setup DNS Record
         run: |
           npm ci
           npm run setup-dns
-        working-directory: dns
         env:
           VERCEL_TOKEN: ${{ secrets.SHOVEL_VERCEL_TOKEN }}
           TEAM_SLUG: shovel-189a0c86
