@@ -90,5 +90,4 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.SHOVEL_VERCEL_TOKEN }}
           TEAM_SLUG: shovel-189a0c86
-          SUB_DOMAIN: argocd
           DOMAIN: shovel.space
