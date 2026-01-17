@@ -1,0 +1,6 @@
+apiVersion: v2
+name: root
+description: A Helm chart managing the Shovel Backend application
+type: application
+version: 1.0.0
+appVersion: "1.0.0"

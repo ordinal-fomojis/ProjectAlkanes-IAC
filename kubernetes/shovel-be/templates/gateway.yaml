@@ -10,8 +10,8 @@ spec:
   - name: http
     port: 80
     protocol: HTTP
-{{- range $config := .Values.routes }}
-  - name: {{ $config.subdomain }}-https
+{{- range $config := (include "routes" . | fromJsonArray) }}
+  - name: {{ $config.name }}-https
     hostname: "{{ $config.subdomain }}.shovel.space"
     port: 443
     protocol: HTTPS
@@ -19,5 +19,5 @@ spec:
       mode: Terminate
       certificateRefs:
       - kind: Secret
-        name: {{ $config.subdomain }}-tls-certificate
+        name: tls-certificate
 {{- end -}}

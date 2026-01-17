@@ -1,0 +1,16 @@
+{{- range $config := .Values.environments -}}
+{{- if $config.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $config.name }}-service
+spec:
+  selector:
+    app.kubernetes.io/name: {{ $config.name }}-shovel-app
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+---
+{{- end -}}
+{{- end -}}

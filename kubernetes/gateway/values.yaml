@@ -1,7 +1,0 @@
-routes:
-  - subdomain: argocd
-    service: argocd-server
-    namespace: argocd
-  - subdomain: api
-    service: api-service
-    namespace: api
