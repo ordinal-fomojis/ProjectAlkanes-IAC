@@ -1,12 +1,12 @@
-{{- range $config := .Values.routes -}}
+{{- range $config := include "routes" . | fromJsonArray -}}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: {{ $config.subdomain }}-http-route
+  name: {{ $config.name }}-http-route
 spec:
   parentRefs:
   - name: gateway
-    sectionName: {{ $config.subdomain }}-https
+    sectionName: {{ $config.name }}-https
   hostnames:
   - "{{ $config.subdomain }}.shovel.space"
   rules:

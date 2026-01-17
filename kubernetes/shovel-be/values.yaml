@@ -1,0 +1,20 @@
+baseSubdomain: apiv2
+
+environments:
+  - name: prod
+    enabled: true
+  - name: staging
+    enabled: false
+  - name: mock
+    enabled: false
+  - name: testnet
+    enabled: false
+  - name: dev
+    enabled: true
+
+# Routes, other than those for the main app, which are inferred from the environments above
+routes:
+  - name: argocd
+    subdomain: argocd
+    service: argocd-server
+    namespace: argocd
