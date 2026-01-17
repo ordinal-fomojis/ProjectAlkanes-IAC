@@ -74,3 +74,22 @@ jobs:
           kubectl apply -f ./root-application.yaml
         
         working-directory: kubernetes
+    
+      - name: Sleep
+        run: sleep 30
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm run setup-dns
+        working-directory: dns
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          TEAM_SLUG: shovel-189a0c86
+          SUB_DOMAIN: argocd
+          DOMAIN: shovel.space
