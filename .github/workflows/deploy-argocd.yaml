@@ -89,7 +89,7 @@ jobs:
           npm run setup-dns
         working-directory: dns
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.SHOVEL_VERCEL_TOKEN }}
           TEAM_SLUG: shovel-189a0c86
           SUB_DOMAIN: argocd
           DOMAIN: shovel.space
