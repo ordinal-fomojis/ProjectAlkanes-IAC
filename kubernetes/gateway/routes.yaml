@@ -5,7 +5,7 @@ metadata:
 spec:
   parentRefs:
   - name: gateway
-    sectionName: https
+    sectionName: argocd-https
   hostnames:
   - "argocd.shovel.space"
   rules:
