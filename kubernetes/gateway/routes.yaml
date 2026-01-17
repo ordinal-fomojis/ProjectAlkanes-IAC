@@ -4,7 +4,10 @@ metadata:
   name: argocd-http-route
 spec:
   parentRefs:
-  - name: argocd-gateway
+  - name: gateway
+    sectionName: https
+  hostnames:
+  - "argocd.shovel.space"
   rules:
   - matches:
     - path:
