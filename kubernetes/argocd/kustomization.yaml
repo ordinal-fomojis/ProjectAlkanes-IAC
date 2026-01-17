@@ -5,6 +5,7 @@ namespace: argocd
 
 resources:
 - github.com/argoproj/argo-cd/manifests/cluster-install?ref=v3.2.3
+- base/reference-grant.yaml
 
 patches:
 - path: patches/argocd-cmd-params-cm.yaml
