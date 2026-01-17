@@ -1,25 +1,10 @@
 import { Vercel } from '@vercel/sdk'
-import { z } from 'zod'
-import child_process from 'child_process'
-import { promisify } from 'util'
-const exec = promisify(child_process.exec)
+import { CoreV1Api, KubeConfig } from '@kubernetes/client-node'
 
 const TOKEN = process.env.VERCEL_TOKEN!
 const DOMAIN = process.env.DOMAIN!
 const SUB_DOMAIN = process.env.SUB_DOMAIN!
 const TEAM_SLUG = process.env.TEAM_SLUG!
-
-const K8S_SERVICE_SCHEMA = z.object({
-  items: z.array(z.object({
-    status: z.object({
-      loadBalancer: z.object({
-        ingress: z.array(z.object({
-          ip: z.string()
-        })).optional()
-      })
-    })
-  }))
-})
 
 const vercel = new Vercel({ bearerToken: TOKEN })
 
@@ -80,9 +65,14 @@ async function getDnsRecord() {
 }
 
 async function getIpAddress() {
-  const { stdout } = await exec('kubectl get svc -n gateway -o json')
-  const services = K8S_SERVICE_SCHEMA.parse(JSON.parse(stdout))
-  const ips = new Set(services.items.flatMap(item => item.status.loadBalancer.ingress?.map(({ ip }) => ip) ?? []))
+  const kc = new KubeConfig()
+  kc.loadFromDefault()
+  const k8sApi = kc.makeApiClient(CoreV1Api)
+
+  const services = await k8sApi.listNamespacedService({ namespace: 'gateway' })
+  const ips = new Set(services.items
+    .flatMap(service => service.status?.loadBalancer?.ingress?.map(ingress => ingress.ip) ?? [])
+    .filter(ip => ip != null))
   const ip = Array.from(ips)[0]
   if (ips.size !== 1 || ip == null) {
     throw new Error(`Expected exactly one IP address. Found: [${Array.from(ips).join(', ')}]`)

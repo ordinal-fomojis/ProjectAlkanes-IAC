@@ -10,8 +10,8 @@
     "setup-dns": "tsx scripts/setup-dns.ts"
   },
   "dependencies": {
-    "@vercel/sdk": "^1.18.7",
-    "zod": "^4.3.5"
+    "@kubernetes/client-node": "^1.4.0",
+    "@vercel/sdk": "^1.18.7"
   },
   "devDependencies": {
     "@types/node": "^25.0.9",
