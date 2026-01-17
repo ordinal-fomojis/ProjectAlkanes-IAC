@@ -1,11 +1,18 @@
 import { Vercel } from '@vercel/sdk'
 import { CoreV1Api, KubeConfig } from '@kubernetes/client-node'
 
-const TOKEN = process.env.VERCEL_TOKEN!
-const DOMAIN = process.env.DOMAIN!
-const SUB_DOMAIN = process.env.SUB_DOMAIN!
-const TEAM_SLUG = process.env.TEAM_SLUG!
+function getRequiredEnv(name: string): string {
+  const value = process.env[name]
+  if (value == null || value === '') {
+    throw new Error(`Missing required environment variable: ${name}`)
+  }
+  return value
+}
 
+const TOKEN = getRequiredEnv('VERCEL_TOKEN')
+const DOMAIN = getRequiredEnv('DOMAIN')
+const SUB_DOMAIN = getRequiredEnv('SUB_DOMAIN')
+const TEAM_SLUG = getRequiredEnv('TEAM_SLUG')
 const vercel = new Vercel({ bearerToken: TOKEN })
 
 const ip = await getIpAddress()
