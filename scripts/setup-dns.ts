@@ -15,24 +15,25 @@ const SUB_DOMAIN = getRequiredEnv('SUB_DOMAIN')
 const TEAM_SLUG = getRequiredEnv('TEAM_SLUG')
 const vercel = new Vercel({ bearerToken: TOKEN })
 
-const ip = await getIpAddress()
-const record = await getDnsRecord()
-await updateDnsRecord(record, ip)
+await updateDnsRecord()
 
-async function updateDnsRecord(record: Awaited<ReturnType<typeof getDnsRecord>>, ip: string) {
-  if (record != null && record.value === ip) {
+async function updateDnsRecord() {
+  const existingDnsRecord = await getDnsRecord()
+  const ip = await getIpAddress()
+
+  if (existingDnsRecord != null && existingDnsRecord.value === ip) {
     console.log(`DNS record already set to ${ip}. No changes required.`)
     return
   }
 
-  if (record == null) {
+  if (existingDnsRecord == null) {
     await createDnsRecord(ip)
     return
   }
 
   console.log(`DNS record exists but is out of date. Updating record to ${ip}.`)
   await vercel.dns.updateRecord({
-    recordId: record.id,
+    recordId: existingDnsRecord.id,
     slug: TEAM_SLUG,
     requestBody: {
       value: ip
