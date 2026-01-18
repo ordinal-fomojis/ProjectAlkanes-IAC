@@ -15,6 +15,7 @@ const TEAM_SLUG = getRequiredEnv('TEAM_SLUG')
 const vercel = new Vercel({ bearerToken: TOKEN })
 
 await updateDnsRecord('argocd')
+await updateDnsRecord('apiv2')
 await updateDnsRecord('*.apiv2')
 
 async function updateDnsRecord(subdomain: string) {
@@ -22,7 +23,7 @@ async function updateDnsRecord(subdomain: string) {
   const ip = await getIpAddress()
 
   if (existingDnsRecord != null && existingDnsRecord.value === ip) {
-    console.log(`DNS record already set to ${ip}. No changes required.`)
+    console.log(`DNS record already set for subdomain ${subdomain} to IP ${ip}. No changes required.`)
     return
   }
 
@@ -31,7 +32,7 @@ async function updateDnsRecord(subdomain: string) {
     return
   }
 
-  console.log(`DNS record exists but is out of date. Updating record to ${ip}.`)
+  console.log(`DNS record exists but is out of date. Updating record for subdomain ${subdomain} to IP ${ip}.`)
   await vercel.dns.updateRecord({
     recordId: existingDnsRecord.id,
     slug: TEAM_SLUG,
@@ -39,7 +40,7 @@ async function updateDnsRecord(subdomain: string) {
       value: ip
     }
   })
-  console.log(`DNS record updated to ${ip}.`)
+  console.log(`DNS record updated for subdomain ${subdomain} to IP ${ip}.`)
 }
 
 async function createDnsRecord(ip: string, subdomain: string) {
@@ -52,7 +53,7 @@ async function createDnsRecord(ip: string, subdomain: string) {
       value: ip
     }
   })
-  console.log(`DNS record created for ${ip}.`)
+  console.log(`DNS record created for subdomain ${subdomain} with IP ${ip}.`)
 }
 
 async function getDnsRecord(subdomain: string) {
