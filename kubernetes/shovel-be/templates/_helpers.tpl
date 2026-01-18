@@ -12,7 +12,7 @@
 {{- $allRoutes := .Values.routes -}}
 {{- range $config := .Values.environments -}}
   {{- if $config.enabled -}}
-    {{- $route := dict "name" $config.name "subdomain" (include "subdomain" (list $.Values.baseSubdomain $config)) "service" (printf "%s-service" $config.name) "namespace" "shovel-be" "port" "8080" -}}
+    {{- $route := dict "name" $config.name "subdomain" (include "subdomain" (list $.Values.baseSubdomain $config)) "service" (printf "%s-service" $config.name) "namespace" "shovel-be" -}}
     {{- $allRoutes = append $allRoutes $route -}}
   {{- end -}}
 {{- end -}}

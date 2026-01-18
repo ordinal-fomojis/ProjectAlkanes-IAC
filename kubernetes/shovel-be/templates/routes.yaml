@@ -17,6 +17,6 @@ spec:
     backendRefs:
     - name: {{ $config.service }}
       namespace: {{ $config.namespace }}
-      port: {{ $config.port }}
+      port: 80
 ---
 {{- end -}}
