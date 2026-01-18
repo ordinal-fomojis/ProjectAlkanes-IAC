@@ -12,6 +12,16 @@ resource "azurerm_kubernetes_cluster" "aks" {
     min_count            = 1
     max_count            = 10
     node_count           = 1
+
+    upgrade_settings {
+      drain_timeout_in_minutes      = 5
+      max_surge                     = "10%"
+      node_soak_duration_in_minutes = 0
+    }
+  }
+
+  key_vault_secrets_provider {
+    secret_rotation_enabled = true
   }
 
   identity {

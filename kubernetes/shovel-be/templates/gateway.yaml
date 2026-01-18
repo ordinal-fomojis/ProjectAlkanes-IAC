@@ -10,7 +10,7 @@ spec:
   - name: http
     port: 80
     protocol: HTTP
-{{- range $config := (include "routes" . | fromJsonArray) }}
+{{- range $config := include "routes" . | fromJsonArray }}
   - name: {{ $config.name }}-https
     hostname: "{{ $config.subdomain }}.shovel.space"
     port: 443
