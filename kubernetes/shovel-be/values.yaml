@@ -18,4 +18,3 @@ routes:
     subdomain: argocd
     service: argocd-server
     namespace: argocd
-    port: 80
