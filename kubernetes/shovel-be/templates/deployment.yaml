@@ -27,7 +27,11 @@ spec:
           value: {{ $config.name }}
         - name: NODE_ENV
           value: production
-        - name: {{ include "dotenvKeyName" $config }}
+        - name: RATE_LIMIT_ENABLED
+          value: "false"
+        - name: DOTENV_PATH
+          value: "env/.env.{{ $config.name }}"
+        - name: DOTENV_PRIVATE_KEY_{{ $config.name | upper }}
           valueFrom:
             secretKeyRef:
               name: {{ include "dotenvSecretName" $config }}
