@@ -72,18 +72,18 @@ jobs:
           
           # Write secrets to the values file
           cat > "$SECRETS_FILE" <<EOF
-          gitPassword: ${{ secrets.ALKANES_IAC_PAT }}
-          gitUrl: ${{ github.repositoryUrl }}
+          gitPassword: "${{ secrets.ALKANES_IAC_PAT }}"
+          gitUrl: "${{ github.repositoryUrl }}"
           dotenvPrivateKeys:
-            prod: ${{ secrets.SHOVEL_DOTENV_PRIVATE_KEY_PROD }}
-            nonprod: ${{ secrets.SHOVEL_DOTENV_PRIVATE_KEY_NONPROD }}
+            prod: "${{ secrets.SHOVEL_DOTENV_PRIVATE_KEY_PROD }}"
+            nonprod: "${{ secrets.SHOVEL_DOTENV_PRIVATE_KEY_NONPROD }}"
           EOF
           
           # Install helm chart using the values file
           helm upgrade --install cluster-config ./cluster-config -f "$SECRETS_FILE"
           
-          # Clean up the temporary file
-          rm -f "$SECRETS_FILE"
+          # Securely delete the temporary file
+          shred -u "$SECRETS_FILE"
           
           kubectl apply -k ./argocd
           kubectl apply -f ./root-application.yaml
