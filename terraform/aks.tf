@@ -20,10 +20,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
     }
   }
 
-  key_vault_secrets_provider {
-    secret_rotation_enabled = true
-  }
-
   identity {
     type = "SystemAssigned"
   }
