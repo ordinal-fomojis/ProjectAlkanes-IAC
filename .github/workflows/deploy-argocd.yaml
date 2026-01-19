@@ -71,7 +71,6 @@ jobs:
           
           cat > "$SECRETS_FILE" <<EOF
           gitPassword: "$ALKANES_IAC_PAT"
-          gitUrl: "$GIT_URL"
           dotenvPrivateKeys:
             prod: "$DOTENV_PROD"
             nonprod: "$DOTENV_NONPROD"
@@ -86,7 +85,6 @@ jobs:
         working-directory: kubernetes
         env:
           ALKANES_IAC_PAT: ${{ secrets.ALKANES_IAC_PAT }}
-          GIT_URL: ${{ github.repositoryUrl }}
           DOTENV_PROD: ${{ secrets.SHOVEL_DOTENV_PRIVATE_KEY_PROD }}
           DOTENV_NONPROD: ${{ secrets.SHOVEL_DOTENV_PRIVATE_KEY_NONPROD }}
     
