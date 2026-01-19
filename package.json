@@ -8,7 +8,8 @@
     "tf-plan": "./scripts/tf-plan.sh",
     "tf-apply": "./scripts/tf-apply.sh",
     "kubectl-init": "./scripts/kubectl-init.sh",
-    "setup-dns": "tsx scripts/setup-dns.ts"
+    "setup-dns": "tsx scripts/setup-dns.ts",
+    "pw": "argocd admin initial-password -n argocd"
   },
   "dependencies": {
     "@kubernetes/client-node": "^1.4.0",
