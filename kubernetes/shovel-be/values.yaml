@@ -1,4 +1,5 @@
 baseSubdomain: apiv2
+imageTag: 0390b531366cd07052ec11b0cf0591202283302a
 
 environments:
   - name: prod
