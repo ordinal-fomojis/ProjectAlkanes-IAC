@@ -20,7 +20,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: {{ $config.name }}-shovel-be
-        image: shovelacr.azurecr.io/shovel-be:0390b531366cd07052ec11b0cf0591202283302a
+        image: shovelacr.azurecr.io/shovel-be:{{ $.Values.imageTag }}
         env:
         - name: APP_ENV
           value: {{ $config.name }}
