@@ -18,3 +18,21 @@
 {{- end -}}
 {{- toJson $allRoutes -}}
 {{- end -}}
+
+{{/* Returns the key name for dotenv private key */}}
+{{- define "dotenvKeyName" -}}
+{{- if .name | eq "prod" -}}
+DOTENV_PRIVATE_KEY_PROD
+{{- else -}}
+DOTENV_PRIVATE_KEY_NONPROD
+{{- end -}}
+{{- end -}}
+
+{{/* Returns name of k8s resource containing dotenv private key */}}
+{{- define "dotenvSecretName" -}}
+{{- if .name | eq "prod" -}}
+dotenv-private-key-prod
+{{- else -}}
+dotenv-private-key-nonprod
+{{- end -}}
+{{- end -}}

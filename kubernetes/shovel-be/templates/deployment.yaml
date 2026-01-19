@@ -26,6 +26,11 @@ spec:
           value: {{ $config.name }}
         - name: NODE_ENV
           value: production
+        - name: {{ include "dotenvKeyName" $config }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "dotenvSecretName" $config }}
+              key: key
         ports:
         - containerPort: 8080
         livenessProbe:
