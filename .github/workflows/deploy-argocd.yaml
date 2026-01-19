@@ -88,8 +88,10 @@ jobs:
           DOTENV_PROD: ${{ secrets.SHOVEL_DOTENV_PRIVATE_KEY_PROD }}
           DOTENV_NONPROD: ${{ secrets.SHOVEL_DOTENV_PRIVATE_KEY_NONPROD }}
     
-      - name: Sleep
-        run: sleep 30
+      - name: Wait for Gateway IP Address
+        run: |
+          kubectl wait gateway/gateway -n shovel-be --timeout=120s \
+            --for=jsonpath='{.status.addresses[?(@.type=="IPAddress")].value}'
 
       - name: Setup Node
         uses: actions/setup-node@v4
