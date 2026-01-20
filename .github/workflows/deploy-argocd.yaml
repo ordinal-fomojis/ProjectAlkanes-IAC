@@ -90,6 +90,10 @@ jobs:
     
       - name: Wait for Gateway IP Address
         run: |
+          until kubectl get gateway/gateway -n shovel-be; do
+            echo "Waiting for gateway to be created..."
+            sleep 5
+          done
           kubectl wait gateway/gateway -n shovel-be --timeout=120s \
             --for=jsonpath='{.status.addresses[?(@.type=="IPAddress")].value}'
 
