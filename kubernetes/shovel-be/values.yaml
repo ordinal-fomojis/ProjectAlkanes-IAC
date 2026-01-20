@@ -1,25 +1,25 @@
 baseSubdomain: apiv2
 
 environments:
-  - name: prod
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: true
-  - name: stage
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: false
-  - name: mock
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: false
-  - name: testnet
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: false
-  - name: dev
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: true
+- name: prod
+  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
+  enabled: true
+- name: stage
+  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
+  enabled: false
+- name: mock
+  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
+  enabled: false
+- name: testnet
+  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
+  enabled: false
+- name: dev
+  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
+  enabled: true
 
 # Routes, other than those for the main app, which are inferred from the environments above
 routes:
-  - name: argocd
-    subdomain: argocd
-    service: argocd-server
-    namespace: argocd
+- name: argocd
+  subdomain: argocd
+  service: argocd-server
+  namespace: argocd
