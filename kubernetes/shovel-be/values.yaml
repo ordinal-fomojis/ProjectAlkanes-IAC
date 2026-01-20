@@ -1,16 +1,20 @@
 baseSubdomain: apiv2
-imageTag: 0390b531366cd07052ec11b0cf0591202283302a
 
 environments:
   - name: prod
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
     enabled: true
   - name: staging
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
     enabled: false
   - name: mock
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
     enabled: false
   - name: testnet
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
     enabled: false
   - name: dev
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
     enabled: true
 
 # Routes, other than those for the main app, which are inferred from the environments above
