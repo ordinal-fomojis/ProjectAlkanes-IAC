@@ -1,4 +1,3 @@
-
 resource "azurerm_kubernetes_cluster" "aks" {
   name                = "shovel-aks${local.postfix}"
   location            = azurerm_resource_group.rg.location
