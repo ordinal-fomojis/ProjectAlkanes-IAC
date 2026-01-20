@@ -4,7 +4,7 @@ environments:
   name: prod
   tag: 0390b531366cd07052ec11b0cf0591202283302a
 - enabled: false
-  name: staging
+  name: stage
   tag: 0390b531366cd07052ec11b0cf0591202283302a
 - enabled: false
   name: mock
