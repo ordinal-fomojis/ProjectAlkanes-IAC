@@ -1,4 +1,4 @@
-baseSubdomain: apiv2
+baseSubdomain: api
 
 autoscaling:
   minReplicas: 1
@@ -8,7 +8,7 @@ autoscaling:
 
 resources:
   requests:
-    cpu: 250m
+    cpu: 200m
     memory: 300Mi
   limits:
     cpu: 500m
