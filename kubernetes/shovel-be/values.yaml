@@ -1,21 +1,38 @@
 baseSubdomain: apiv2
 
+autoscaling:
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
 environments:
-- name: prod
-  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
-  enabled: true
-- name: stage
-  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
-  enabled: false
-- name: mock
-  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
-  enabled: false
-- name: testnet
-  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
-  enabled: false
-- name: dev
-  tag: 80471272cf8a340555819efb69fcd3fa25f8144f
-  enabled: true
+  - name: prod
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
+    enabled: true
+    autoscaling:
+      minReplicas: 2
+      maxReplicas: 10
+  - name: stage
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
+    enabled: false
+  - name: mock
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
+    enabled: false
+  - name: testnet
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
+    enabled: false
+  - name: dev
+    tag: 0390b531366cd07052ec11b0cf0591202283302a
+    enabled: true
 
 # Routes, other than those for the main app, which are inferred from the environments above
 routes:
