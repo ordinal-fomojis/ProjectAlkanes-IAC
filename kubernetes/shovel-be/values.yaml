@@ -9,7 +9,7 @@ autoscaling:
 resources:
   requests:
     cpu: 100m
-    memory: 128Mi
+    memory: 300Mi
   limits:
     cpu: 500m
     memory: 512Mi
@@ -19,7 +19,7 @@ environments:
   tag: 2ac0b5e345bc123798b7fb539e26ef0211b47e07
   enabled: true
   autoscaling:
-    minReplicas: 2
+    minReplicas: 1
     maxReplicas: 10
 - name: stage
   tag: 2ac0b5e345bc123798b7fb539e26ef0211b47e07
