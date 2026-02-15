@@ -38,6 +38,13 @@ spec:
               key: key
         ports:
         - containerPort: 8080
+        resources:
+          requests:
+            cpu: {{ $config.resources.requests.cpu }}
+            memory: {{ $config.resources.requests.memory }}
+          limits:
+            cpu: {{ $config.resources.limits.cpu }}
+            memory: {{ $config.resources.limits.memory }}
         livenessProbe:
           httpGet:
             path: /api/health
