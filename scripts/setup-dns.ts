@@ -15,8 +15,8 @@ const TEAM_SLUG = getRequiredEnv('TEAM_SLUG')
 const vercel = new Vercel({ bearerToken: TOKEN })
 
 await updateDnsRecord('argocd')
-await updateDnsRecord('apiv2')
-await updateDnsRecord('*.apiv2')
+await updateDnsRecord('api')
+await updateDnsRecord('*.api')
 
 async function updateDnsRecord(subdomain: string) {
   const existingDnsRecord = await getDnsRecord(subdomain)
