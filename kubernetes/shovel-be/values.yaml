@@ -8,31 +8,31 @@ autoscaling:
 
 resources:
   requests:
-    cpu: "100m"
-    memory: "128Mi"
+    cpu: 100m
+    memory: 128Mi
   limits:
-    cpu: "500m"
-    memory: "512Mi"
+    cpu: 500m
+    memory: 512Mi
 
 environments:
-  - name: prod
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: true
-    autoscaling:
-      minReplicas: 2
-      maxReplicas: 10
-  - name: stage
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: false
-  - name: mock
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: false
-  - name: testnet
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: false
-  - name: dev
-    tag: 0390b531366cd07052ec11b0cf0591202283302a
-    enabled: true
+- name: prod
+  tag: 2ac0b5e345bc123798b7fb539e26ef0211b47e07
+  enabled: true
+  autoscaling:
+    minReplicas: 2
+    maxReplicas: 10
+- name: stage
+  tag: 2ac0b5e345bc123798b7fb539e26ef0211b47e07
+  enabled: false
+- name: mock
+  tag: 2ac0b5e345bc123798b7fb539e26ef0211b47e07
+  enabled: false
+- name: testnet
+  tag: 2ac0b5e345bc123798b7fb539e26ef0211b47e07
+  enabled: false
+- name: dev
+  tag: 2ac0b5e345bc123798b7fb539e26ef0211b47e07
+  enabled: true
 
 # Routes, other than those for the main app, which are inferred from the environments above
 routes:
