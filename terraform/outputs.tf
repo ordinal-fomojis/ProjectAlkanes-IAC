@@ -4,12 +4,6 @@ output "function_app_name" {
   }
 }
 
-output "webapp_name" {
-  value = {
-    for key, value in azurerm_linux_web_app.webapp : key => value.name
-  }
-}
-
 output "rg_name" {
   value = azurerm_resource_group.rg.name
 }
