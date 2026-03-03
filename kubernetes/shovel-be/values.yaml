@@ -25,13 +25,13 @@ environments:
   tag: 2ac0b5e345bc123798b7fb539e26ef0211b47e07
   enabled: false
 - name: mock
-  tag: 07afda7e5093051e3308cfad3f3687d0d511cd5e
+  tag: 25c08990eeebff91fe0f1cb3ff8d152225c89fef
   enabled: false
 - name: testnet
-  tag: 07afda7e5093051e3308cfad3f3687d0d511cd5e
+  tag: 25c08990eeebff91fe0f1cb3ff8d152225c89fef
   enabled: false
 - name: dev
-  tag: 07afda7e5093051e3308cfad3f3687d0d511cd5e
+  tag: 25c08990eeebff91fe0f1cb3ff8d152225c89fef
   enabled: true
 
 # Routes, other than those for the main app, which are inferred from the environments above
